@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Talep Başarılı - PyQt5 Uygulamalarım{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 text-center">
+            <div class="card border-success">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Talep Başarıyla Gönderildi!</h2>
+                    
+                    <p class="lead">
+                        Talebiniz başarıyla alınmıştır. En kısa sürede değerlendirip 
+                        size dönüş yapacağız.
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock me-2"></i>
+                        Ortalama yanıt süresi: <strong>24 saat</strong>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-center">
+                        <a href="{% url 'pages:home' %}" class="btn btn-primary me-md-2">
+                            <i class="fas fa-home me-1"></i>Anasayfaya Dön
+                        </a>
+                        <a href="{% url 'catalog:application_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-rocket me-1"></i>Uygulamaları İncele
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h6>İletişim Kanalları</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <a href="{% url 'pages:contact' %}" class="btn btn-success btn-sm w-100">
+                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="mailto:info@example.com" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-envelope me-1"></i>E-posta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

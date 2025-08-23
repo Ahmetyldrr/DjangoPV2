@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ freelancer.get_full_name }} - Freelancer Profili - DjangoPage{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sol Taraf - Profil Bilgileri -->
+        <div class="col-lg-4">
+            <div class="content-section sticky-top">
+                <!-- Profil Kartı -->
+                <div class="text-center mb-4">
+                    {% if freelancer.avatar %}
+                        <img src="{{ freelancer.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" style="object-fit: cover;">
+                    {% else %}
+                        <div class="avatar-placeholder mb-3">
+                            <i class="fas fa-user fa-4x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <h2>{{ freelancer.get_full_name }}</h2>
+                    <p class="text-primary fw-bold fs-5">{{ freelancer_profile.title }}</p>
+                    
+                    <!-- Rating -->
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <div class="rating me-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= freelancer_profile.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="fw-bold">{{ freelancer_profile.rating }}/5</span>
+                        <span class="text-muted ms-1">({{ freelancer_profile.rating_count }} değerlendirme)</span>
+                    </div>
+                    
+                    <!-- Konum -->
+                    {% if freelancer_profile.city %}
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {{ freelancer_profile.city }}{% if freelancer_profile.country %}, {{ freelancer_profile.country }}{% endif %}
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Durum -->
+                    {% if freelancer_profile.is_available %}
+                        <span class="badge bg-success fs-6 mb-3">
+                            <i class="fas fa-circle me-1"></i>Çalışmaya Uygun
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary fs-6 mb-3">
+                            <i class="fas fa-circle me-1"></i>Meşgul
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <!-- İstatistikler -->
+                <div class="stats-section mb-4">
+                    <h5 class="mb-3">İstatistikler</h5>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ freelancer_profile.total_projects }}</div>
+                                <div class="stat-label">Proje</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ freelancer_profile.experience_years }}</div>
+                                <div class="stat-label">Yıl</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ freelancer_profile.total_earnings|floatformat:0 }}₺</div>
+                                <div class="stat-label">Kazanç</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ücret -->
+                {% if freelancer_profile.hourly_rate %}
+                <div class="price-section mb-4">
+                    <h5 class="mb-2">Saatlik Ücret</h5>
+                    <div class="price-display">
+                        <span class="price">{{ freelancer_profile.hourly_rate }}₺</span>
+                        <span class="text-muted">/saat</span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- İletişim Butonları -->
+                {% if can_message %}
+                <div class="contact-section">
+                    <a href="{% url 'chat:start_chat' freelancer.id %}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-comments me-2"></i>Mesaj Gönder
+                    </a>
+                    <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        <i class="fas fa-handshake me-2"></i>Proje Teklifi
+                    </button>
+                </div>
+                {% endif %}
+                
+                <!-- Sosyal Medya -->
+                {% if freelancer_profile.portfolio_url or freelancer_profile.github_url or freelancer_profile.linkedin_url %}
+                <div class="social-section mt-4">
+                    <h5 class="mb-3">Bağlantılar</h5>
+                    <div class="social-links">
+                        {% if freelancer_profile.portfolio_url %}
+                        <a href="{{ freelancer_profile.portfolio_url }}" target="_blank" class="btn btn-outline-dark btn-sm me-2 mb-2">
+                            <i class="fas fa-globe me-1"></i>Portfolio
+                        </a>
+                        {% endif %}
+                        {% if freelancer_profile.github_url %}
+                        <a href="{{ freelancer_profile.github_url }}" target="_blank" class="btn btn-outline-dark btn-sm me-2 mb-2">
+                            <i class="fab fa-github me-1"></i>GitHub
+                        </a>
+                        {% endif %}
+                        {% if freelancer_profile.linkedin_url %}
+                        <a href="{{ freelancer_profile.linkedin_url }}" target="_blank" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            <i class="fab fa-linkedin me-1"></i>LinkedIn
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Sağ Taraf - İçerik -->
+        <div class="col-lg-8">
+            <!-- Hakkında -->
+            <div class="content-section mb-4">
+                <h3 class="mb-3">Hakkında</h3>
+                {% if freelancer.bio %}
+                    <p class="text-muted">{{ freelancer.bio|linebreaks }}</p>
+                {% else %}
+                    <p class="text-muted">Bu freelancer henüz kendisi hakkında bilgi paylaşmamış.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Yetenekler -->
+            {% if freelancer_profile.skills %}
+            <div class="content-section mb-4">
+                <h3 class="mb-3">Yetenekler</h3>
+                <div class="skills-container">
+                    {% for skill in freelancer_profile.skills_list %}
+                        <span class="badge bg-light text-dark me-2 mb-2 p-2">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Projeler -->
+            <div class="content-section mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Projeler</h3>
+                    <span class="badge bg-primary">{{ projects|length }} proje</span>
+                </div>
+                
+                {% if projects %}
+                    <div class="row">
+                        {% for project in projects %}
+                        <div class="col-md-6 mb-4">
+                            <div class="project-card">
+                                {% if project.featured_image %}
+                                    <img src="{{ project.featured_image.url }}" class="project-image" alt="{{ project.title }}">
+                                {% else %}
+                                    <div class="project-image-placeholder">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="project-content">
+                                    <h5 class="project-title">{{ project.title }}</h5>
+                                    <p class="project-description">{{ project.description|truncatewords:15 }}</p>
+                                    
+                                    <!-- Teknolojiler -->
+                                    {% if project.technologies %}
+                                    <div class="project-tech mb-2">
+                                        {% for tech in project.technologies_list %}
+                                            <small class="badge bg-secondary me-1">{{ tech }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="project-footer">
+                                        <span class="text-muted">{{ project.get_budget_range_display }}</span>
+                                        <a href="{% url 'careers:project_detail' project.slug %}" class="btn btn-sm btn-primary">
+                                            Detayları Gör
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Henüz hiç proje paylaşılmamış.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+{% if can_message %}
+<div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ freelancer.get_full_name }}'a Proje Teklifi Gönder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Proje Başlığı</label>
+                        <input type="text" class="form-control" name="project_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Proje Açıklaması</label>
+                        <textarea class="form-control" name="project_description" rows="4" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Bütçe (TL)</label>
+                            <input type="number" class="form-control" name="budget" min="0" step="100" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Süre (gün)</label>
+                            <input type="number" class="form-control" name="deadline_days" min="1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">İletişim Bilgileri</label>
+                        <input type="email" class="form-control" name="contact_email" value="{{ user.email }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Teklif Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.content-section {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.stat-item {
+    padding: 15px 10px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.price-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.skills-container .badge {
+    font-size: 0.875rem;
+    border: 1px solid #dee2e6;
+}
+
+.project-card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.project-image, .project-image-placeholder {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-content {
+    padding: 20px;
+}
+
+.project-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    height: 2.4em;
+    overflow: hidden;
+}
+
+.project-description {
+    color: #6c757d;
+    font-size: 0.875rem;
+    height: 3.6em;
+    overflow: hidden;
+}
+
+.project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.social-links .btn {
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .col-lg-4 .content-section {
+        position: static !important;
+    }
+}
+</style>
+{% endblock %}

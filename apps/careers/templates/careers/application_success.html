@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Başvuru Başarılı - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="content-section">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h2 class="text-success mb-3">Başvurunuz Alındı!</h2>
+                
+                <p class="lead text-muted mb-4">
+                    Freelancer başvurunuz başarıyla gönderilmiştir. 
+                    Değerlendirme sürecinde sizinle iletişime geçeceğiz.
+                </p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Sonraki Adımlar:</strong>
+                    <ul class="list-unstyled mt-2 mb-0">
+                        <li><i class="fas fa-check me-2 text-success"></i>Başvurunuz 48 saat içinde değerlendirilecek</li>
+                        <li><i class="fas fa-envelope me-2 text-primary"></i>E-posta ile sonuç bildirilecek</li>
+                        <li><i class="fas fa-star me-2 text-warning"></i>Onay alırsanız platformumuzda projelerinizi sergileyebileceksiniz</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'careers:home' %}" class="btn btn-primary me-3">
+                        <i class="fas fa-arrow-left me-2"></i>Kariyer Sayfasına Dön
+                    </a>
+                    <a href="{% url 'pages:home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>Ana Sayfaya Git
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.content-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(116, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    text-align: left;
+}
+</style>
+{% endblock %}

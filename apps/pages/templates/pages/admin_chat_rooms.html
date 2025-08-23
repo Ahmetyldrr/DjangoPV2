@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat Odaları - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    <i class="fas fa-comments text-primary me-2"></i>Chat Odaları
+                </h1>
+                <a href="{% url 'pages:admin_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Dashboard'a Dön
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chat Odaları Listesi -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if chat_rooms %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Oda Adı</th>
+                                        <th>Katılımcılar</th>
+                                        <th>Son Mesaj</th>
+                                        <th>Son Aktivite</th>
+                                        <th>Mesaj Sayısı</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for room in chat_rooms %}
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                {% if room.name %}
+                                                    {{ room.name }}
+                                                {% else %}
+                                                    Chat Room #{{ room.id }}
+                                                {% endif %}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            {% for participant in room.participants.all %}
+                                                <span class="badge bg-secondary me-1">
+                                                    {{ participant.get_full_name|default:participant.email }}
+                                                </span>
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% with room.get_last_message as last_message %}
+                                                {% if last_message %}
+                                                    <small class="text-muted">
+                                                        <strong>{{ last_message.sender.get_full_name|default:last_message.sender.email }}:</strong>
+                                                        {{ last_message.content|truncatechars:50 }}
+                                                    </small>
+                                                {% else %}
+                                                    <span class="text-muted">Henüz mesaj yok</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ room.updated_at|date:"d M Y H:i" }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ room.messages.count }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'chat:room' room_id=room.id %}" 
+                                               class="btn btn-primary btn-sm" target="_blank">
+                                                <i class="fas fa-eye me-1"></i>Görüntüle
+                                            </a>
+                                            <a href="{% url 'chat:room' room_id=room.id %}" 
+                                               class="btn btn-success btn-sm ms-1" target="_blank">
+                                                <i class="fas fa-comment me-1"></i>Katıl
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="Sayfa navigasyonu">
+                            <ul class="pagination justify-content-center mt-4">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i> Önceki
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        Sonraki <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Henüz Chat Odası Yok</h4>
+                            <p class="text-muted">Henüz hiç chat odası oluşturulmamış.</p>
+                            <a href="{% url 'chat:start_support_chat' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Destek Chat Başlat
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- İstatistikler -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Toplam Oda</h5>
+                    <h3>{{ chat_rooms|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Aktif Katılımcı</h5>
+                    <h3>
+                        {% widthratio chat_rooms|length 1 2 %}+
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Bugünkü Mesajlar</h5>
+                    <h3>
+                        {% now "Y-m-d" as today %}
+                        {% for room in chat_rooms %}
+                            {{ room.messages.count|add:0 }}
+                        {% endfor %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Destek Chatleri</h5>
+                    <h3>
+                        {% for room in chat_rooms %}
+                            {% if "Destek" in room.name|default:"" %}{{ forloop.counter }}{% endif %}
+                        {% endfor %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    font-size: 0.8em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.table-hover > tbody > tr:hover > td {
+    background-color: rgba(0, 0, 0, 0.025);
+}
+
+.card.bg-primary, .card.bg-success, .card.bg-info, .card.bg-warning {
+    border: none;
+}
+
+.card.bg-primary .card-body, .card.bg-success .card-body, 
+.card.bg-info .card-body, .card.bg-warning .card-body {
+    text-align: center;
+}
+</style>
+{% endblock %}

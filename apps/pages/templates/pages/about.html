@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hakkımızda - FxApp{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="fw-bold mb-3">
+                <i class="fas fa-rocket text-primary me-2"></i>FxApp Hakkında
+            </h1>
+            <p class="lead text-muted">Geleceğin teknolojilerini bugünden sizlerle buluşturan yenilikçi yazılım şirketi</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Misyon -->
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-center fw-bold mb-4">Misyonumuz</h3>
+                    <p class="lead text-center text-muted">
+                        Teknolojinin gücünü kullanarak, işletmelerin ve bireylerin dijital dönüşüm süreçlerinde 
+                        yanlarında olmak, yaşamlarını kolaylaştıran ve verimliliği artıran yenilikçi yazılım 
+                        çözümleri sunmak.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Değerlerimiz -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Değerlerimiz</h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-lightbulb fa-3x"></i>
+                    </div>
+                    <h5 class="fw-bold">İnovasyon</h5>
+                    <p class="text-muted">
+                        En son teknolojileri takip ederek, yaratıcı ve özgün çözümler geliştiriyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="text-success mb-3">
+                        <i class="fas fa-shield-alt fa-3x"></i>
+                    </div>
+                    <h5 class="fw-bold">Kalite</h5>
+                    <p class="text-muted">
+                        Her projede en yüksek kalite standartlarını uygulayarak, güvenilir çözümler sunuyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="text-warning mb-3">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h5 class="fw-bold">Müşteri Odaklılık</h5>
+                    <p class="text-muted">
+                        Müşterilerimizin ihtiyaçlarını anlayarak, onlara özel çözümler üretiyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teknolojilerimiz -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3 class="fw-bold mb-0"><i class="fas fa-code me-2"></i>Teknoloji Yığınımız</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-desktop me-2 text-primary"></i>Masaüstü Geliştirme</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fab fa-python text-warning me-2"></i>Python & PyQt5/6</li>
+                                <li class="mb-2"><i class="fas fa-window-maximize text-info me-2"></i>Electron.js</li>
+                                <li class="mb-2"><i class="fab fa-microsoft text-primary me-2"></i>.NET & WPF</li>
+                                <li class="mb-2"><i class="fas fa-code text-success me-2"></i>C++ & Qt</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-globe me-2 text-success"></i>Web Geliştirme</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fab fa-python text-warning me-2"></i>Django & FastAPI</li>
+                                <li class="mb-2"><i class="fab fa-js text-warning me-2"></i>JavaScript & Node.js</li>
+                                <li class="mb-2"><i class="fab fa-react text-info me-2"></i>React & Vue.js</li>
+                                <li class="mb-2"><i class="fas fa-database text-primary me-2"></i>PostgreSQL & MongoDB</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-mobile-alt me-2 text-info"></i>Mobil Geliştirme</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fab fa-flutter text-info me-2"></i>Flutter</li>
+                                <li class="mb-2"><i class="fab fa-react text-info me-2"></i>React Native</li>
+                                <li class="mb-2"><i class="fab fa-android text-success me-2"></i>Android Native</li>
+                                <li class="mb-2"><i class="fab fa-apple text-dark me-2"></i>iOS Native</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-cloud me-2 text-warning"></i>Bulut & DevOps</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fab fa-aws text-warning me-2"></i>Amazon Web Services</li>
+                                <li class="mb-2"><i class="fab fa-docker text-info me-2"></i>Docker & Kubernetes</li>
+                                <li class="mb-2"><i class="fab fa-github text-dark me-2"></i>GitHub Actions</li>
+                                <li class="mb-2"><i class="fas fa-server text-secondary me-2"></i>Linux & Nginx</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Süreç -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Çalışma Sürecimiz</h2>
+            <p class="text-muted">Projelerinizi hayata geçirirken izlediğimiz adımlar</p>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">1</span>
+                </div>
+                <h5 class="fw-bold">Analiz</h5>
+                <p class="text-muted">İhtiyaçlarınızı detaylı şekilde analiz ediyoruz</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">2</span>
+                </div>
+                <h5 class="fw-bold">Tasarım</h5>
+                <p class="text-muted">Kullanıcı deneyimini ön planda tutarak tasarlıyoruz</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">3</span>
+                </div>
+                <h5 class="fw-bold">Geliştirme</h5>
+                <p class="text-muted">En iyi teknolojilerle kodlama yapıyoruz</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">4</span>
+                </div>
+                <h5 class="fw-bold">Teslimat</h5>
+                <p class="text-muted">Test edilmiş ve hazır çözümü teslim ediyoruz</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-4">
+                            <h2 class="fw-bold text-primary">50+</h2>
+                            <p class="text-muted">Tamamlanan Proje</p>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <h2 class="fw-bold text-success">5+</h2>
+                            <p class="text-muted">Yıllık Deneyim</p>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <h2 class="fw-bold text-warning">100+</h2>
+                            <p class="text-muted">Mutlu Müşteri</p>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <h2 class="fw-bold text-info">%99</h2>
+                            <p class="text-muted">Müşteri Memnuniyeti</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

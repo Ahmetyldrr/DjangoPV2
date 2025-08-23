@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-tachometer-alt text-primary me-2"></i>Admin Dashboard
+            </h1>
+        </div>
+    </div>
+    
+    <!-- İstatistik Kartları -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Yeni Mesajlar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ new_messages_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-envelope fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Acil Mesajlar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ urgent_messages_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Toplam Chat Odası</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_chat_rooms }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Aktif Chatler (24s)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_chats }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comment-dots fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Son İletişim Mesajları -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Son İletişim Mesajları</h6>
+                    <a href="{% url 'pages:admin_contact_messages' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>Tümünü Gör
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_contact_messages %}
+                        {% for message in recent_contact_messages %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <span class="badge bg-{% if message.status == 'new' %}danger{% elif message.status == 'read' %}warning{% elif message.status == 'replied' %}success{% else %}secondary{% endif %}">
+                                    {% if message.status == 'new' %}Yeni{% elif message.status == 'read' %}Okundu{% elif message.status == 'replied' %}Cevaplandı{% else %}Kapatıldı{% endif %}
+                                </span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    <a href="{% url 'pages:admin_contact_message_detail' pk=message.pk %}" class="text-decoration-none">
+                                        {{ message.subject }}
+                                    </a>
+                                </h6>
+                                <p class="mb-1 text-muted">{{ message.name }} - {{ message.email }}</p>
+                                <small class="text-muted">{{ message.created_at|date:"d M Y H:i" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">Henüz mesaj yok.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Son Chat Mesajları -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Son Chat Mesajları</h6>
+                    <a href="{% url 'pages:admin_chat_rooms' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-comments me-1"></i>Chat Odaları
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_chat_messages %}
+                        {% for message in recent_chat_messages %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <div class="avatar-sm">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        {{ message.sender.first_name|first }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ message.sender.get_full_name }}</h6>
+                                <p class="mb-1 text-muted">{{ message.content|truncatechars:50 }}</p>
+                                <small class="text-muted">{{ message.created_at|date:"d M Y H:i" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">Henüz chat mesajı yok.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hızlı Erişim -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hızlı Erişim</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'pages:admin_contact_messages' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-envelope me-2"></i>İletişim Mesajları
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'pages:admin_chat_rooms' %}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-comments me-2"></i>Chat Odaları
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'chat:start_support_chat' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-headset me-2"></i>Destek Chat Başlat
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/" class="btn btn-outline-dark w-100">
+                                <i class="fas fa-cog me-2"></i>Django Admin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15) !important;
+}
+</style>
+{% endblock %}

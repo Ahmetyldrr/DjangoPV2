@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - PyQt5 Uygulamalarım{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Anasayfa</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'categories:category_list' %}">Kategoriler</a></li>
+                    <li class="breadcrumb-item active">{{ category.name }}</li>
+                </ol>
+            </nav>
+            
+            <h1>
+                <i class="fas fa-folder me-2"></i>{{ category.name }}
+            </h1>
+            
+            {% if category.description %}
+            <p class="lead">{{ category.description }}</p>
+            {% endif %}
+            
+            <div class="mb-3">
+                <span class="badge bg-primary">{{ applications|length }} uygulama</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for app in applications %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ app.title }}</h5>
+                    <p class="card-text">{{ app.short_description }}</p>
+                    <div class="mb-2">
+                        {% for tag in app.get_tags_list %}
+                        <span class="badge bg-light text-dark">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>{{ app.created_at|date:"d.m.Y" }}
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ app.get_absolute_url }}" class="btn btn-primary">
+                        <i class="fas fa-info-circle me-1"></i>Detaylar
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Bu kategoride henüz uygulama bulunmuyor.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FxApp - Yenilikçi Yazılım Çözümleri{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Geleceğin Yazılımları <br>
+                    <span class="text-warning">Bugün Hazır</span>
+                </h1>
+                <p class="lead mb-4">
+                    FxApp olarak, işinizi kolaylaştıran, verimliliğinizi artıran ve 
+                    teknolojinin gücünü elinize veren yenilikçi yazılım çözümleri sunuyoruz.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'catalog:application_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Uygulamaları Keşfet
+                    </a>
+                    <a href="{% url 'requestsapp:create' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>Özel Talep
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <svg width="400" height="300" viewBox="0 0 400 300" class="img-fluid">
+                        <!-- Teknoloji illustrasyonu -->
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Ana ekran -->
+                        <rect x="50" y="50" width="300" height="200" rx="20" fill="url(#grad1)" opacity="0.9"/>
+                        <rect x="60" y="80" width="280" height="140" rx="10" fill="white"/>
+                        <!-- Kod blokları -->
+                        <rect x="80" y="100" width="60" height="8" rx="4" fill="#3b82f6"/>
+                        <rect x="150" y="100" width="40" height="8" rx="4" fill="#10b981"/>
+                        <rect x="80" y="120" width="80" height="8" rx="4" fill="#f59e0b"/>
+                        <rect x="170" y="120" width="50" height="8" rx="4" fill="#ef4444"/>
+                        <!-- Floating elements -->
+                        <circle cx="320" cy="80" r="15" fill="#3b82f6" opacity="0.7"/>
+                        <circle cx="350" cy="120" r="10" fill="#10b981" opacity="0.8"/>
+                        <circle cx="370" cy="90" r="8" fill="#f59e0b" opacity="0.9"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- İstatistikler -->
+<section class="py-5 bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 text-center mb-4">
+                <div class="stats-card p-4 h-100">
+                    <h3 class="fw-bold mb-2">{{ recent_applications|length }}+</h3>
+                    <p class="mb-0">Aktif Uygulama</p>
+                </div>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="stats-card p-4 h-100">
+                    <h3 class="fw-bold mb-2">{{ categories|length }}+</h3>
+                    <p class="mb-0">Kategori</p>
+                </div>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="stats-card p-4 h-100">
+                    <h3 class="fw-bold mb-2">1000+</h3>
+                    <p class="mb-0">Mutlu Kullanıcı</p>
+                </div>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="stats-card p-4 h-100">
+                    <h3 class="fw-bold mb-2">%99</h3>
+                    <p class="mb-0">Memnuniyet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Son Eklenen Uygulamalar -->
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>Öne Çıkan Uygulamalar
+                </h2>
+                <p class="lead text-muted">En yeni ve popüler yazılım çözümlerimizi keşfedin</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for app in recent_applications %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card app-card h-100">
+                    {% if app.image %}
+                    <img src="{{ app.image.url }}" class="card-img-top" alt="{{ app.title }}">
+                    {% else %}
+                    <div class="card-img-top bg-gradient d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-desktop fa-3x text-white"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ app.title }}</h5>
+                        <p class="card-text text-muted">{{ app.short_description|truncatewords:15 }}</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary">{{ app.category.name }}</span>
+                            {% for tag in app.get_tags_list|slice:":2" %}
+                            <span class="badge bg-secondary">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ app.created_at|date:"d.m.Y" }}
+                            </small>
+                            {% if app.youtube_url %}
+                            <small class="text-danger">
+                                <i class="fab fa-youtube me-1"></i>Video
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex gap-2">
+                            <a href="{{ app.get_absolute_url }}" class="btn btn-primary flex-fill">
+                                <i class="fas fa-info-circle me-1"></i>Detaylar
+                            </a>
+                            {% if app.pdf_file %}
+                            <a href="{{ app.pdf_file.url }}" target="_blank" class="btn btn-outline-secondary">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h4>Yakında Yeni Uygulamalar!</h4>
+                    <p class="text-muted">Şu anda geliştirme aşamasındaki projelerimizi yakında sizlerle paylaşacağız.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if recent_applications %}
+        <div class="text-center mt-4">
+            <a href="{% url 'catalog:application_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-arrow-right me-2"></i>Tüm Uygulamaları Görüntüle
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Kategoriler -->
+{% if categories %}
+<section class="py-5 bg-light">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-th-large text-primary me-2"></i>Uygulama Kategorileri
+                </h2>
+                <p class="lead text-muted">İhtiyacınıza uygun kategoriyi seçin</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card border-0 h-100 text-center">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-folder fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">{{ category.name }}</h5>
+                            <p class="card-text text-muted">
+                                {{ category.description|truncatewords:10|default:"Kategori açıklaması..." }}
+                            </p>
+                            <div class="mt-3">
+                                <span class="badge bg-primary">{{ category.applications.count }} uygulama</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-center text-white py-5">
+                        <h3 class="fw-bold mb-3">Özel Bir Yazılıma İhtiyacınız Var mı?</h3>
+                        <p class="lead mb-4">
+                            Bizimle iletişime geçin ve ihtiyaçlarınıza özel yazılım çözümleri geliştirelim.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3 justify-content-center">
+                            <a href="{% url 'requestsapp:create' %}" class="btn btn-light btn-lg">
+                                <i class="fas fa-plus me-2"></i>Talep Oluştur
+                            </a>
+                            <a href="{% url 'pages:contact' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

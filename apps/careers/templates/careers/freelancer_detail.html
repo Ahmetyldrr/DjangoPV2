@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ freelancer.application.full_name }} - Freelancer Profili - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <!-- Sol Panel - Profil Bilgileri -->
+        <div class="col-lg-4 mb-4">
+            <div class="content-section text-center">
+                <!-- Profil Resmi -->
+                <div class="profile-avatar mb-4">
+                    {% if freelancer.profile_image %}
+                        <img src="{{ freelancer.profile_image.url }}" alt="{{ freelancer.application.full_name }}" class="rounded-circle profile-img">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user-circle fa-8x text-primary"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Temel Bilgiler -->
+                <h2 class="fw-bold mb-2">{{ freelancer.application.full_name }}</h2>
+                <p class="text-primary fs-5 mb-3">{{ freelancer.application.title }}</p>
+                
+                <!-- Konum ve Deneyim -->
+                <div class="mb-3">
+                    <span class="badge bg-info me-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ freelancer.application.city }}
+                    </span>
+                    <span class="badge bg-warning">
+                        <i class="fas fa-calendar-alt me-1"></i>{{ freelancer.application.experience_years }} yıl deneyim
+                    </span>
+                </div>
+
+                <!-- Seviye -->
+                <div class="mb-3">
+                    <span class="badge bg-success fs-6">
+                        <i class="fas fa-star me-1"></i>{{ freelancer.application.get_skill_level_display }}
+                    </span>
+                </div>
+
+                <!-- Saatlik Ücret -->
+                {% if freelancer.hourly_rate %}
+                <div class="pricing-card mb-4">
+                    <div class="pricing-amount">{{ freelancer.hourly_rate }} TL/saat</div>
+                    <small class="text-muted">Saatlik ücret</small>
+                </div>
+                {% endif %}
+
+                <!-- Durum -->
+                <div class="status-badges mb-4">
+                    {% if freelancer.is_available %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Çalışmaya Uygun
+                        </span>
+                    {% else %}
+                        <span class="badge bg-warning">
+                            <i class="fas fa-clock me-1"></i>Meşgul
+                        </span>
+                    {% endif %}
+                    
+                    {% if freelancer.is_active %}
+                        <span class="badge bg-primary">
+                            <i class="fas fa-user-check me-1"></i>Aktif
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- İstatistikler -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ freelancer.total_projects }}</div>
+                        <div class="stat-label">Proje</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ freelancer.rating|floatformat:1 }}</div>
+                        <div class="stat-label">Puan</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ freelancer.total_earnings|floatformat:0 }} TL</div>
+                        <div class="stat-label">Kazanç</div>
+                    </div>
+                </div>
+
+                <!-- İletişim Butonları -->
+                <div class="contact-buttons">
+                    <button class="btn btn-primary btn-lg w-100 mb-2" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        <i class="fas fa-envelope me-2"></i>İletişime Geç
+                    </button>
+                    
+                    {% if freelancer.application.portfolio_url %}
+                    <a href="{{ freelancer.application.portfolio_url }}" target="_blank" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="fas fa-link me-2"></i>Portfolyo
+                    </a>
+                    {% endif %}
+                    
+                    {% if freelancer.application.github_url %}
+                    <a href="{{ freelancer.application.github_url }}" target="_blank" class="btn btn-outline-dark w-100 mb-2">
+                        <i class="fab fa-github me-2"></i>GitHub
+                    </a>
+                    {% endif %}
+                    
+                    {% if freelancer.application.linkedin_url %}
+                    <a href="{{ freelancer.application.linkedin_url }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Panel - Detay Bilgileri -->
+        <div class="col-lg-8">
+            <!-- Hakkında -->
+            <div class="content-section mb-4">
+                <h4 class="section-title">
+                    <i class="fas fa-user me-2"></i>Hakkında
+                </h4>
+                {% if freelancer.bio %}
+                    <p>{{ freelancer.bio }}</p>
+                {% endif %}
+                <p>{{ freelancer.application.cover_letter }}</p>
+            </div>
+
+            <!-- Yetenekler -->
+            <div class="content-section mb-4">
+                <h4 class="section-title">
+                    <i class="fas fa-code me-2"></i>Teknik Yetenekler
+                </h4>
+                <div class="skills-container">
+                    {% for skill in freelancer.application.skills_list %}
+                        <span class="skill-badge">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Projeler -->
+            <div class="content-section mb-4">
+                <h4 class="section-title">
+                    <i class="fas fa-project-diagram me-2"></i>Projeler ({{ freelancer.projects.count }})
+                </h4>
+                
+                {% if freelancer.projects.exists %}
+                    <div class="row">
+                        {% for project in freelancer.projects.all|slice:":6" %}
+                        <div class="col-md-6 mb-3">
+                            <div class="project-card">
+                                {% if project.featured_image %}
+                                    <img src="{{ project.featured_image.url }}" class="project-img" alt="{{ project.title }}">
+                                {% else %}
+                                    <div class="project-img-placeholder">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="project-content">
+                                    <h6 class="project-title">{{ project.title }}</h6>
+                                    <p class="project-description">{{ project.description|truncatewords:15 }}</p>
+                                    
+                                    <div class="project-meta">
+                                        <span class="badge bg-light text-dark">{{ project.category.name }}</span>
+                                        <span class="text-muted small">
+                                            <i class="fas fa-eye me-1"></i>{{ project.views }} görüntülenme
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="project-actions mt-2">
+                                        <a href="{{ project.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>Detaylar
+                                        </a>
+                                        {% if project.demo_url %}
+                                        <a href="{{ project.demo_url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-external-link-alt me-1"></i>Demo
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if freelancer.projects.count > 6 %}
+                    <div class="text-center">
+                        <a href="{% url 'careers:freelancer_projects' freelancer.slug %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i>Tüm Projeleri Gör ({{ freelancer.projects.count }})
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Henüz proje paylaşılmamış</h5>
+                        <p class="text-muted">Bu freelancer henüz hiç proje paylaşmamış.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Değerlendirmeler -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="fas fa-star me-2"></i>Değerlendirmeler
+                </h4>
+                
+                <div class="rating-summary mb-4">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="rating-number">{{ freelancer.rating|floatformat:1 }}</div>
+                            <div class="rating-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= freelancer.rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <p class="text-muted">15 değerlendirme üzerinden ortalama puan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Örnek değerlendirmeler -->
+                <div class="reviews-list">
+                    <div class="review-item">
+                        <div class="review-header">
+                            <strong>Mustafa K.</strong>
+                            <div class="review-stars">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <small class="text-muted">2 gün önce</small>
+                        </div>
+                        <p class="review-text">"Mükemmel iş çıkardı. Zamanında teslim etti ve çok profesyonel yaklaştı."</p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="review-header">
+                            <strong>Ayşe M.</strong>
+                            <div class="review-stars">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="far fa-star text-muted"></i>
+                            </div>
+                            <small class="text-muted">1 hafta önce</small>
+                        </div>
+                        <p class="review-text">"Kaliteli çalışma. Sadece iletişim biraz yavaştı ama sonuç çok güzel oldu."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- İletişim Modalı -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">
+                    <i class="fas fa-envelope me-2"></i>{{ freelancer.application.full_name }} ile İletişime Geç
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Adınız</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-posta</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Konu</label>
+                        <input type="text" class="form-control" placeholder="Proje hakkında" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mesajınız</label>
+                        <textarea class="form-control" rows="4" placeholder="Projeniz hakkında detaylı bilgi verin..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bütçe (TL)</label>
+                        <input type="number" class="form-control" placeholder="5000">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Mesaj Gönder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    margin: 0 auto;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pricing-card {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.pricing-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.section-title {
+    color: #2563eb;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-badge {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.project-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.project-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.project-img-placeholder {
+    width: 100%;
+    height: 120px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-content {
+    padding: 1rem;
+}
+
+.project-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.project-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.rating-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fbbf24;
+}
+
+.rating-stars {
+    font-size: 1.5rem;
+}
+
+.review-item {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.review-stars {
+    margin: 0 1rem;
+}
+
+.review-text {
+    color: #4b5563;
+    font-style: italic;
+}
+</style>
+{% endblock %}

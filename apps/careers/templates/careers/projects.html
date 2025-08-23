@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load career_extras %}
+
+{% block title %}Freelancer Projeleri - FxApp{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1><i class="fas fa-project-diagram me-3"></i>Freelancer Projeleri</h1>
+                <p class="lead">Yetenekli freelancer'larımızın projelerini keşfedin</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-5">
+    <!-- Filtreler -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="content-section">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Kategori</label>
+                        <select name="category" class="form-select">
+                            <option value="">Tüm Kategoriler</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if category == cat.slug %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Bütçe Aralığı</label>
+                        <select name="budget" class="form-select">
+                            <option value="">Tüm Bütçeler</option>
+                            {% for value, label in budget_ranges %}
+                                <option value="{{ value }}" {% if budget == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Arama</label>
+                        <input type="text" name="search" class="form-control" placeholder="Proje ara..." value="{{ search }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Filtrele
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projeler -->
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card project-card h-100">
+                {% if project.featured_image %}
+                    <img src="{{ project.featured_image.url }}" class="card-img-top" alt="{{ project.title }}">
+                {% else %}
+                    <div class="card-img-top bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-project-diagram fa-3x text-white"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        {% if project.category %}
+                        <span class="badge bg-primary">{{ project.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text text-muted">{{ project.description|truncatewords:20 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="text-success fw-bold">
+                            <i class="fas fa-tag me-1"></i>{{ project.get_budget_range_display }}
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-clock me-1"></i>{{ project.estimated_duration }}
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-info mb-3">
+                        <div class="d-flex align-items-center">
+                            {% if project.freelancer.application.profile_photo %}
+                                <img src="{{ project.freelancer.application.profile_photo.url }}" class="avatar rounded-circle me-2" alt="{{ project.freelancer.application.full_name }}">
+                            {% else %}
+                                <div class="avatar me-2">
+                                    <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <div class="fw-semibold">{{ project.freelancer.application.full_name }}</div>
+                                <div class="text-muted small">{{ project.freelancer.application.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-1 mb-3">
+                        {% for tech in project.technologies|split:"," %}
+                            <span class="badge bg-light text-dark">{{ tech|trim }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'careers:project_detail' project.slug %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>Detaylar
+                        </a>
+                        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#offerModal-{{ project.id }}">
+                            <i class="fas fa-handshake me-1"></i>Teklif Al
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Henüz proje bulunmuyor</h4>
+                <p class="text-muted">Freelancer'larımız yakında projelerini paylaşacaklar.</p>
+                <a href="{% url 'careers:apply' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Freelancer Ol
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Sayfa navigasyonu">
+                <ul class="pagination justify-content-center">
+                    {% if projects.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ projects.previous_page_number }}">Önceki</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in projects.paginator.page_range %}
+                        {% if projects.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if projects.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ projects.next_page_number }}">Sonraki</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin-bottom: 0;
+}
+
+.project-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.project-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.freelancer-info {
+    border-left: 3px solid #667eea;
+    padding-left: 10px;
+}
+
+.badge {
+    font-size: 0.7rem;
+}
+</style>
+{% endblock %}

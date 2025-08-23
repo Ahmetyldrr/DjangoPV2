@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ other_participant.get_full_name }} ile Chat - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        
+                        {% if other_participant.avatar %}
+                            <img src="{{ other_participant.avatar.url }}" class="rounded-circle me-3" width="40" height="40">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div>
+                            <h5 class="mb-0">{{ other_participant.get_full_name }}</h5>
+                            {% if other_participant.is_freelancer %}
+                                <small class="text-muted">{{ other_participant.freelancer_profile.title }}</small>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="ms-auto">
+                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#offerModal">
+                                <i class="fas fa-handshake me-1"></i>Teklif Gönder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    {% for message in messages %}
+                        <div class="message {% if message.sender == user %}message-own{% else %}message-other{% endif %}">
+                            <div class="message-content">
+                                <p class="mb-1">{{ message.content|linebreaks }}</p>
+                                <small class="text-muted">{{ message.created_at|date:"H:i" }}</small>
+                                {% if message.sender == user and message.is_read %}
+                                    <i class="fas fa-check-double text-primary ms-1" title="Okundu"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Henüz mesaj yok. İlk mesajı gönderin!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Chat Input -->
+                <div class="chat-input">
+                    <form id="messageForm" class="d-flex">
+                        {% csrf_token %}
+                        <input type="hidden" id="roomId" value="{{ room.id }}">
+                        <input type="text" id="messageInput" class="form-control me-2" placeholder="Mesajınızı yazın..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Teklif Modal -->
+<div class="modal fade" id="offerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Proje Teklifi Gönder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="offerForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Proje Başlığı *</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Proje Açıklaması *</label>
+                        <textarea name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Bütçe (TL) *</label>
+                            <input type="number" name="budget" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Teslim Tarihi *</label>
+                            <input type="date" name="deadline" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Teklif Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 12px 12px 0 0;
+    background: #f8f9fa;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(70vh - 140px);
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.message-own {
+    justify-content: flex-end;
+}
+
+.message-other {
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.message-own .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.message-other .message-content {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.chat-input {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 12px 12px;
+    background: #f8f9fa;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 3px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageForm = document.getElementById('messageForm');
+    const messageInput = document.getElementById('messageInput');
+    const messagesContainer = document.getElementById('chatMessages');
+    const roomId = document.getElementById('roomId').value;
+    
+    // Scroll to bottom
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Initial scroll
+    scrollToBottom();
+    
+    // Send message
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const content = messageInput.value.trim();
+        if (!content) return;
+        
+        const formData = {
+            room_id: roomId,
+            content: content,
+            message_type: 'text'
+        };
+        
+        fetch('{% url "chat:send_message" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add message to chat
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-own';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <p class="mb-1">${content}</p>
+                        <small class="text-muted">Şimdi</small>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+                messageInput.value = '';
+                scrollToBottom();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
+    // Auto-focus input
+    messageInput.focus();
+});
+</script>
+{% endblock %}

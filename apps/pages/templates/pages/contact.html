@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}İletişim - FxApp{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">
+                <i class="fas fa-envelope me-2"></i>İletişim
+            </h1>
+            
+            <!-- Mesaj Alerts -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- İletişim Formu -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-paper-plane text-primary me-2"></i>Mesaj Gönder
+                    </h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }} (İsteğe bağlı)</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                    <div class="text-danger">{{ form.subject.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">{{ form.message.label }}</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger">{{ form.message.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Mesajı Gönder
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fab fa-whatsapp text-success me-2"></i>WhatsApp
+                            </h5>
+                            <p class="card-text">
+                                Hızlı iletişim için WhatsApp üzerinden bize ulaşabilirsiniz.
+                            </p>
+                            <a href="https://wa.me/+905xxxxxxxxx" class="btn btn-success" target="_blank">
+                                <i class="fab fa-whatsapp me-1"></i>WhatsApp'ta Mesaj Gönder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-envelope text-primary me-2"></i>Direkt E-posta
+                            </h5>
+                            <p class="card-text">
+                                E-posta istemciniz üzerinden mesaj göndermek için.
+                            </p>
+                            <a href="mailto:info@fxapp.com" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>E-posta İstemcisi Aç
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-question-circle text-info me-2"></i>Talep Formu
+                    </h5>
+                    <p class="card-text">
+                        Özel yazılım geliştirme taleplerriniz için aşağıdaki formu kullanabilirsiniz.
+                    </p>
+                    <a href="{% url 'requestsapp:create' %}" class="btn btn-info">
+                        <i class="fas fa-plus me-1"></i>Yeni Talep Oluştur
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Çalışma Saatleri</h5>
+                    <p class="card-text">
+                        <strong>Pazartesi - Cuma:</strong> 09:00 - 18:00<br>
+                        <strong>Cumartesi:</strong> 10:00 - 16:00<br>
+                        <strong>Pazar:</strong> Kapalı
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

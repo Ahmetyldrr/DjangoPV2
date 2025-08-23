@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Yeni Proje Oluştur - FxApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-project-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 60px 0 40px;
+    }
+    
+    .create-project-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .section-title {
+        color: #4f46e5;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .btn-create {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 15px 40px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: #6b7280;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 15px;
+    }
+    
+    .btn-cancel:hover {
+        background: #4b5563;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .page-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .page-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+    }
+    
+    .form-text {
+        color: #6b7280;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+    
+    .required-field::after {
+        content: ' *';
+        color: #ef4444;
+    }
+    
+    .image-preview {
+        max-width: 200px;
+        max-height: 150px;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-project-container">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Yeni Proje Oluştur</h1>
+            <p class="page-subtitle">Portföyünüze yeni bir proje ekleyin ve potansiyel müşterilere ulaşın</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="create-project-card">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Temel Bilgiler -->
+                        <div class="form-section">
+                            <h5 class="section-title">Temel Bilgiler</h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label required-field">Proje Başlığı</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Projenizi en iyi şekilde tanımlayan kısa ve öz bir başlık</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label required-field">Proje Açıklaması</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger">{{ form.description.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Projenin detayları, kullanılan teknolojiler ve özellikler</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.category.id_for_label }}" class="form-label required-field">Kategori</label>
+                                        {{ form.category }}
+                                        {% if form.category.errors %}
+                                            <div class="text-danger">{{ form.category.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.budget_range.id_for_label }}" class="form-label required-field">Bütçe Aralığı</label>
+                                        {{ form.budget_range }}
+                                        {% if form.budget_range.errors %}
+                                            <div class="text-danger">{{ form.budget_range.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Teknik Detaylar -->
+                        <div class="form-section">
+                            <h5 class="section-title">Teknik Detaylar</h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.technologies.id_for_label }}" class="form-label required-field">Kullanılan Teknolojiler</label>
+                                {{ form.technologies }}
+                                {% if form.technologies.errors %}
+                                    <div class="text-danger">{{ form.technologies.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Teknolojileri virgülle ayırarak yazın (örn: Python, Django, React)</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.project_url.id_for_label }}" class="form-label">Proje URL'si</label>
+                                        {{ form.project_url }}
+                                        {% if form.project_url.errors %}
+                                            <div class="text-danger">{{ form.project_url.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Canlı proje bağlantısı (opsiyonel)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.github_url.id_for_label }}" class="form-label">GitHub URL'si</label>
+                                        {{ form.github_url }}
+                                        {% if form.github_url.errors %}
+                                            <div class="text-danger">{{ form.github_url.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Kaynak kod bağlantısı (opsiyonel)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Proje Görseli ve Tarih -->
+                        <div class="form-section">
+                            <h5 class="section-title">Görsel ve Tarih</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">Proje Görseli</label>
+                                        {{ form.image }}
+                                        {% if form.image.errors %}
+                                            <div class="text-danger">{{ form.image.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Projeyi temsil eden görsel (maksimum 5MB)</div>
+                                        <img id="imagePreview" class="image-preview" src="#" alt="Görsel önizleme">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.completion_date.id_for_label }}" class="form-label">Tamamlanma Tarihi</label>
+                                        {{ form.completion_date }}
+                                        {% if form.completion_date.errors %}
+                                            <div class="text-danger">{{ form.completion_date.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Projenin ne zaman tamamlandığı</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Öne Çıkarma -->
+                        <div class="form-section">
+                            <h5 class="section-title">Özellikler</h5>
+                            
+                            <div class="form-check">
+                                {{ form.is_featured }}
+                                <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                    Bu projeyi öne çıkar
+                                </label>
+                                <div class="form-text">Öne çıkan projeler daha fazla görünürlük elde eder</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Butonları -->
+                        <div class="text-center">
+                            <a href="{% url 'accounts:freelancer_dashboard' %}" class="btn-cancel">İptal</a>
+                            <button type="submit" class="btn-create">
+                                <i class="fas fa-plus me-2"></i>Projeyi Oluştur
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Görsel önizleme
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

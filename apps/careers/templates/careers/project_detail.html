@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load career_extras %}
+
+{% block title %}{{ project.title }} - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Ana İçerik -->
+        <div class="col-lg-8">
+            <div class="content-section">
+                <!-- Proje Başlığı -->
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h1 class="h2">{{ project.title }}</h1>
+                        {% if project.category %}
+                        <div class="mb-2">
+                            <span class="badge bg-primary fs-6">
+                                <i class="{{ project.category.icon }} me-1"></i>{{ project.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="text-end">
+                        <div class="h4 text-success mb-0">{{ project.get_budget_range_display }}</div>
+                        <small class="text-muted">Bütçe Aralığı</small>
+                    </div>
+                </div>
+
+                <!-- Proje Görseli -->
+                {% if project.featured_image %}
+                <div class="mb-4">
+                    <img src="{{ project.featured_image.url }}" class="img-fluid rounded" alt="{{ project.title }}" style="max-height: 400px; width: 100%; object-fit: cover;">
+                </div>
+                {% endif %}
+
+                <!-- Proje Açıklaması -->
+                <div class="mb-4">
+                    <h3>Proje Açıklaması</h3>
+                    <div class="text-muted">{{ project.description|linebreaks }}</div>
+                </div>
+
+                <!-- Gereksinimler -->
+                {% if project.requirements %}
+                <div class="mb-4">
+                    <h3>Gereksinimler</h3>
+                    <div class="text-muted">{{ project.requirements|linebreaks }}</div>
+                </div>
+                {% endif %}
+
+                <!-- Teslim Edilecekler -->
+                <div class="mb-4">
+                    <h3>Teslim Edilecekler</h3>
+                    <div class="text-muted">{{ project.deliverables|linebreaks }}</div>
+                </div>
+
+                <!-- Teknolojiler -->
+                <div class="mb-4">
+                    <h3>Kullanılan Teknolojiler</h3>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tech in project.technologies|split:"," %}
+                            <span class="badge bg-light text-dark border">{{ tech|trim }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Demo ve GitHub Linkleri -->
+                {% if project.demo_url or project.github_url %}
+                <div class="mb-4">
+                    <h3>Proje Linkleri</h3>
+                    <div class="d-flex gap-3">
+                        {% if project.demo_url %}
+                        <a href="{{ project.demo_url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>Demo Görüntüle
+                        </a>
+                        {% endif %}
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" target="_blank" class="btn btn-outline-dark">
+                            <i class="fab fa-github me-2"></i>GitHub Repo
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Proje Görselleri -->
+                {% if project.images.all %}
+                <div class="mb-4">
+                    <h3>Proje Görselleri</h3>
+                    <div class="row">
+                        {% for image in project.images.all %}
+                        <div class="col-md-4 mb-3">
+                            <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ image.caption }}" data-bs-toggle="modal" data-bs-target="#imageModal" data-bs-image="{{ image.image.url }}" style="cursor: pointer;">
+                            {% if image.caption %}
+                            <small class="text-muted d-block mt-1">{{ image.caption }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Yan Bilgi Paneli -->
+        <div class="col-lg-4">
+            <!-- Freelancer Bilgileri -->
+            <div class="content-section mb-4">
+                <h4 class="mb-3">Freelancer</h4>
+                <div class="d-flex align-items-center mb-3">
+                    {% if project.freelancer.application.profile_photo %}
+                        <img src="{{ project.freelancer.application.profile_photo.url }}" class="rounded-circle me-3" width="60" height="60" alt="{{ project.freelancer.application.full_name }}">
+                    {% else %}
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user text-white fa-lg"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-0">{{ project.freelancer.application.full_name }}</h5>
+                        <small class="text-muted">{{ project.freelancer.application.title }}</small>
+                        <div class="mt-1">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= project.freelancer.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-1">({{ project.freelancer.rating }}/5)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Şehir</small>
+                    <span>{{ project.freelancer.application.city }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Toplam Proje</small>
+                    <span>{{ project.freelancer.total_projects }} proje</span>
+                </div>
+                
+                {% if project.freelancer.hourly_rate %}
+                <div class="mb-3">
+                    <small class="text-muted d-block">Saatlik Ücret</small>
+                    <span class="text-success fw-bold">{{ project.freelancer.hourly_rate }} TL/saat</span>
+                </div>
+                {% endif %}
+                
+                <a href="{{ project.freelancer.get_absolute_url }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-user me-2"></i>Profili Görüntüle
+                </a>
+                
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#offerModal">
+                    <i class="fas fa-handshake me-2"></i>Teklif Gönder
+                </button>
+            </div>
+
+            <!-- Proje Detayları -->
+            <div class="content-section mb-4">
+                <h4 class="mb-3">Proje Detayları</h4>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Tahmini Süre</small>
+                    <span><i class="fas fa-clock me-1"></i>{{ project.estimated_duration }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Durum</small>
+                    <span class="badge bg-success">{{ project.get_status_display }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Görüntülenme</small>
+                    <span><i class="fas fa-eye me-1"></i>{{ project.views }} görüntülenme</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Teklif Sayısı</small>
+                    <span><i class="fas fa-comments me-1"></i>{{ project.offers_count }} teklif</span>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Yayınlanma Tarihi</small>
+                    <span><i class="fas fa-calendar me-1"></i>{{ project.created_at|date:"d M Y" }}</span>
+                </div>
+            </div>
+
+            <!-- Benzer Projeler -->
+            {% if similar_projects %}
+            <div class="content-section">
+                <h4 class="mb-3">Benzer Projeler</h4>
+                {% for similar in similar_projects %}
+                <div class="d-flex mb-3">
+                    {% if similar.featured_image %}
+                        <img src="{{ similar.featured_image.url }}" class="rounded me-3" width="60" height="60" style="object-fit: cover;" alt="{{ similar.title }}">
+                    {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-project-diagram text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            <a href="{% url 'careers:project_detail' similar.slug %}" class="text-decoration-none">
+                                {{ similar.title|truncatechars:50 }}
+                            </a>
+                        </h6>
+                        <small class="text-success">{{ similar.get_budget_range_display }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Teklif Modal -->
+<div class="modal fade" id="offerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Proje Teklifi Gönder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'careers:submit_offer' project.slug %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ad Soyad *</label>
+                            {{ offer_form.client_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-posta *</label>
+                            {{ offer_form.client_email }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefon</label>
+                            {{ offer_form.client_phone }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Şirket</label>
+                            {{ offer_form.company_name }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Teklif Edilen Bütçe (TL) *</label>
+                            {{ offer_form.offer_amount }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Zaman Çizelgesi *</label>
+                            {{ offer_form.timeline }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mesajınız *</label>
+                        {{ offer_form.message }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Teklif Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Görsel Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Proje Görseli</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="Proje Görseli">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.content-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.btn {
+    border-radius: 8px;
+}
+</style>
+
+<script>
+// Görsel modal için
+document.addEventListener('DOMContentLoaded', function() {
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal) {
+        imageModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const imageSrc = button.getAttribute('data-bs-image');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+        });
+    }
+});
+</script>
+{% endblock %}

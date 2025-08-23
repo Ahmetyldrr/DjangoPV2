@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Uygulamalar - FxApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Başlık -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="fw-bold mb-3">
+                <i class="fas fa-rocket text-primary me-2"></i>Yazılım Çözümlerimiz
+            </h1>
+            <p class="lead text-muted">İhtiyacınıza uygun uygulamayı bulun ve hemen indirin</p>
+        </div>
+    </div>
+    
+    <!-- Tab Navigation -->
+    <div class="mb-4">
+        <ul class="nav nav-pills justify-content-center" id="appTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="desktop-apps-tab" data-bs-toggle="pill" 
+                        data-bs-target="#desktop-apps" type="button" role="tab" 
+                        aria-controls="desktop-apps" aria-selected="true">
+                    <i class="fas fa-desktop me-2"></i>Masaüstü Uygulamalar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="freelancer-profiles-tab" data-bs-toggle="pill" 
+                        data-bs-target="#freelancer-profiles" type="button" role="tab" 
+                        aria-controls="freelancer-profiles" aria-selected="false">
+                    <i class="fas fa-users me-2"></i>Freelancer'lar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="recent-projects-tab" data-bs-toggle="pill" 
+                        data-bs-target="#recent-projects" type="button" role="tab" 
+                        aria-controls="recent-projects" aria-selected="false">
+                    <i class="fas fa-project-diagram me-2"></i>Son Projeler
+                </button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="appTabContent">
+        <!-- Masaüstü Uygulamalar Tab -->
+        <div class="tab-pane fade show active" id="desktop-apps" role="tabpanel" aria-labelledby="desktop-apps-tab">
+    
+    <!-- Filtreler -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Arama</label>
+                    <input type="text" class="form-control" name="q" 
+                           placeholder="Uygulama adı, açıklama veya etiket..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kategori</label>
+                    <select class="form-select" name="category">
+                        <option value="">Tüm Kategoriler</option>
+                        {% for category in categories %}
+                        <option value="{{ category.slug }}" 
+                                {% if selected_category == category.slug %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Filtrele
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'catalog:application_list' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times me-1"></i>Temizle
+                    </a>
+                </div>
+                <div class="col-md-1 text-end">
+                    <small class="text-muted">{{ applications|length }} sonuç</small>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Uygulamalar Grid -->
+    <div class="row">
+        {% for app in applications %}
+        <div class="col-xl-4 col-lg-6 mb-4">
+            <div class="card app-card h-100">
+                <!-- Uygulama Resmi -->
+                <div class="position-relative">
+                    {% if app.image %}
+                    <img src="{{ app.image.url }}" class="card-img-top" alt="{{ app.title }}">
+                    {% else %}
+                    <div class="card-img-top bg-gradient d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-desktop fa-3x text-white"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Badges -->
+                    <div class="position-absolute top-0 end-0 p-2">
+                        {% if app.youtube_url %}
+                        <span class="badge bg-danger me-1">
+                            <i class="fab fa-youtube"></i>
+                        </span>
+                        {% endif %}
+                        {% if app.pdf_file %}
+                        <span class="badge bg-warning">
+                            <i class="fas fa-file-pdf"></i>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ app.title }}</h5>
+                    <p class="card-text text-muted">{{ app.short_description|truncatewords:20 }}</p>
+                    
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <span class="badge bg-primary me-1">{{ app.category.name }}</span>
+                        {% for tag in app.get_tags_list|slice:":3" %}
+                        <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Metrics -->
+                    <div class="row text-center small text-muted mb-3">
+                        <div class="col-4">
+                            <i class="fas fa-eye"></i> {{ app.view_count }}
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-download"></i> {{ app.releases.count }}
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-calendar"></i> {{ app.created_at|date:"d.m" }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex gap-2">
+                        <a href="{{ app.get_absolute_url }}" class="btn btn-primary flex-fill">
+                            <i class="fas fa-info-circle me-1"></i>Detaylar
+                        </a>
+                        {% if app.pdf_file %}
+                        <a href="{{ app.pdf_file.url }}" target="_blank" class="btn btn-outline-danger">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        {% endif %}
+                        {% if app.youtube_url %}
+                        <a href="{{ app.youtube_url }}" target="_blank" class="btn btn-outline-danger">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                {% if search_query or selected_category %}
+                    <h4>Arama sonucu bulunamadı</h4>
+                    <p class="text-muted">Farklı anahtar kelimeler veya kategoriler deneyebilirsiniz.</p>
+                    <a href="{% url 'catalog:application_list' %}" class="btn btn-primary">
+                        <i class="fas fa-refresh me-1"></i>Tüm Uygulamaları Görüntüle
+                    </a>
+                {% else %}
+                    <h4>Henüz uygulama eklenmemiş</h4>
+                    <p class="text-muted">Yakında yeni uygulamalar eklenecek.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Sayfalama -->
+    {% if is_paginated %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Sayfa navigasyonu">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            <i class="fas fa-angle-left"></i> Önceki
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            Sonraki <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+        </div>
+        
+        <!-- Freelancer Profilleri Tab -->
+        <div class="tab-pane fade" id="freelancer-profiles" role="tabpanel" aria-labelledby="freelancer-profiles-tab">
+            <div class="row">
+                {% if freelancer_data %}
+                    {% for item in freelancer_data %}
+                    <div class="col-xl-4 col-lg-6 mb-4">
+                        <div class="card freelancer-app-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <a href="{% url 'accounts:freelancer_public_profile' user_id=item.user.id %}" class="text-decoration-none">
+                                        {{ item.user.get_full_name }}
+                                    </a>
+                                </h6>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Aktif
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'accounts:freelancer_public_profile' user_id=item.user.id %}" class="text-decoration-none">
+                                        {{ item.profile.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted">{{ item.profile.skills|truncatechars:100 }}</p>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ item.profile.city }}
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>{{ item.profile.experience_years }} yıl deneyim
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-project-diagram me-1"></i>{{ item.project_count }} proje
+                                    </small>
+                                </div>
+                                
+                                {% if item.profile.hourly_rate %}
+                                <div class="mb-3">
+                                    <span class="badge bg-primary">{{ item.profile.hourly_rate }} TL/saat</span>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <a href="{% url 'accounts:freelancer_public_profile' user_id=item.user.id %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-user me-1"></i>Profili İncele
+                                    </a>
+                                    
+                                    {% if item.profile.portfolio_url %}
+                                    <a href="{{ item.profile.portfolio_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-external-link-alt me-1"></i>Portföy
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if item.profile.github_url %}
+                                    <a href="{{ item.profile.github_url }}" target="_blank" class="btn btn-outline-dark btn-sm">
+                                        <i class="fab fa-github me-1"></i>GitHub
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Son Projeler Önizleme -->
+                                {% if item.projects %}
+                                <div class="border-top pt-3">
+                                    <h6 class="text-muted mb-2">Son Projeleri:</h6>
+                                    {% for project in item.projects %}
+                                    <div class="mb-2">
+                                        <small class="fw-bold">
+                                            <a href="{% url 'careers:project_detail' slug=project.slug %}" class="text-decoration-none">
+                                                {{ project.title }}
+                                            </a>
+                                        </small><br>
+                                        <small class="text-muted">{{ project.description|truncatechars:50 }}</small>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small><i class="fas fa-clock me-1"></i>{{ item.user.date_joined|date:"d M Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Henüz Freelancer Yok</h4>
+                            <p class="text-muted">Yakında yeni freelancer'lar eklenecek.</p>
+                            <a href="{% url 'careers:apply' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Freelancer Ol
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Son Projeler Tab -->
+        <div class="tab-pane fade" id="recent-projects" role="tabpanel" aria-labelledby="recent-projects-tab">
+            <div class="row">
+                {% if recent_projects %}
+                    {% for project in recent_projects %}
+                    <div class="col-xl-4 col-lg-6 mb-4">
+                        <div class="card project-card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <a href="{% url 'careers:project_detail' slug=project.slug %}" class="text-decoration-none text-white">
+                                        {{ project.title }}
+                                    </a>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text text-muted">{{ project.description|truncatechars:120 }}</p>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        <a href="{% url 'accounts:freelancer_public_profile' user_id=project.freelancer.user.id %}" class="text-decoration-none">
+                                            {{ project.freelancer.user.get_full_name }}
+                                        </a>
+                                    </small>
+                                </div>
+                                
+                                {% if project.technologies %}
+                                <div class="mb-3">
+                                    {% for tech in project.technologies_list %}
+                                    <span class="badge bg-light text-dark me-1">{{ tech }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    {% if project.budget %}
+                                    <span class="text-primary fw-bold">{{ project.budget }} TL</span>
+                                    {% endif %}
+                                    <small class="text-muted">{{ project.created_at|date:"d M Y" }}</small>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <a href="{% url 'careers:project_detail' slug=project.slug %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Projeyi İncele
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Henüz Proje Yok</h4>
+                            <p class="text-muted">Freelancer'lar projelerini buraya ekleyebilir.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-pills .nav-link {
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.freelancer-app-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.freelancer-app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.freelancer-app-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px 15px 0 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.project-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.project-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+{% endblock %}

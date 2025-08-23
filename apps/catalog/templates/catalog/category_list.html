@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Kategoriler - PyQt5 Uygulamalarım{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>
+                <i class="fas fa-th-large me-2"></i>Kategoriler
+            </h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    {% if category.description %}
+                    <p class="card-text text-muted">{{ category.description|truncatewords:15 }}</p>
+                    {% endif %}
+                    <div class="mb-2">
+                        <span class="badge bg-primary">{{ category.applications.count }} uygulama</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <a href="{{ category.get_absolute_url }}" class="btn btn-outline-primary">
+                        <i class="fas fa-eye me-1"></i>İncele
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Henüz kategori eklenmemiş.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

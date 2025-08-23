@@ -1,0 +1,64 @@
+{% if releases %}
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Sürüm</th>
+                <th>Kanal</th>
+                <th>Tarih</th>
+                <th>Boyut</th>
+                <th>İndir</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for release in releases %}
+            <tr>
+                <td>
+                    <strong>{{ release.version }}</strong>
+                </td>
+                <td>
+                    {% if release.channel == 'test' %}
+                    <span class="badge bg-warning">TEST</span>
+                    {% else %}
+                    <span class="badge bg-success">KARARLI</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <small>{{ release.published_at|date:"d.m.Y" }}</small>
+                </td>
+                <td>
+                    <small>{{ release.get_file_size_mb }} MB</small>
+                </td>
+                <td>
+                    <a href="{{ release.get_download_url }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </td>
+            </tr>
+            {% if release.changelog_markdown %}
+            <tr>
+                <td colspan="5">
+                    <small class="text-muted">
+                        <i class="fas fa-list me-1"></i>
+                        {{ release.changelog_markdown|truncatewords:20 }}
+                    </small>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-2">
+    <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Toplam {{ releases|length }} sürüm mevcut
+    </small>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    Bu uygulama için henüz sürüm yayınlanmamış.
+</div>
+{% endif %}

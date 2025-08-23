@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load custom_filters static %}
+
+{% block title %}{{ application.title }} - FxApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Anasayfa</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'catalog:application_list' %}">Uygulamalar</a></li>
+            <li class="breadcrumb-item"><a href="{{ application.category.get_absolute_url }}">{{ application.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ application.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Ana İçerik -->
+        <div class="col-lg-8">
+            <!-- Uygulama Başlığı -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% if application.image %}
+                            <img src="{{ application.image.url }}" class="img-fluid rounded" alt="{{ application.title }}">
+                            {% else %}
+                            <div class="bg-gradient d-flex align-items-center justify-content-center rounded" style="height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-desktop fa-3x text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h1 class="fw-bold mb-3">{{ application.title }}</h1>
+                            <p class="lead text-muted mb-3">{{ application.short_description }}</p>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2">{{ application.category.name }}</span>
+                                {% for tag in application.get_tags_list %}
+                                <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Yayın Tarihi</small>
+                                    <strong>{{ application.created_at|date:"d.m.Y" }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Görüntülenme</small>
+                                    <strong>{{ application.view_count }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Sürüm Sayısı</small>
+                                    <strong>{{ releases|length }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YouTube Video -->
+            {% if application.youtube_url %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fab fa-youtube text-danger me-2"></i>Tanıtım Videosu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="video-container">
+                        <iframe src="{{ application.get_youtube_embed_url }}" 
+                                title="YouTube video player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Ekran Görüntüleri -->
+            {% if application.get_screenshots %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-images me-2"></i>Ekran Görüntüleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="screenshot-gallery">
+                        {% for screenshot in application.get_screenshots %}
+                        <div class="screenshot-item" data-bs-toggle="modal" data-bs-target="#screenshotModal{{ forloop.counter }}">
+                            <img src="{{ screenshot.url }}" alt="Ekran görüntüsü {{ forloop.counter }}">
+                        </div>
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="screenshotModal{{ forloop.counter }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body p-0">
+                                        <img src="{{ screenshot.url }}" class="img-fluid w-100" alt="Ekran görüntüsü {{ forloop.counter }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Detaylı Açıklama -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle me-2"></i>Detaylı Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="markdown-content">
+                        {{ application.description_markdown|markdown_to_html|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yan Panel -->
+        <div class="col-lg-4">
+            <!-- İndirme Kartı -->
+            <div class="card mb-4 sticky-top" style="top: 100px;">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-download me-2"></i>İndir</h5>
+                </div>
+                <div class="card-body">
+                    {% include 'releases/release_table.html' %}
+                </div>
+            </div>
+
+            <!-- PDF Döküman -->
+            {% if application.pdf_file %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-file-pdf text-danger me-2"></i>Dokümantasyon</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                    <p class="text-muted">Kullanım kılavuzu ve detaylı dokümantasyon</p>
+                    <a href="{{ application.pdf_file.url }}" target="_blank" class="btn btn-outline-danger">
+                        <i class="fas fa-external-link-alt me-1"></i>PDF'yi Aç
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Sosyal Paylaşım -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-share-alt me-2"></i>Paylaş</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" onclick="shareApp('twitter')">
+                            <i class="fab fa-twitter me-2"></i>Twitter'da Paylaş
+                        </button>
+                        <button class="btn btn-outline-success" onclick="shareApp('whatsapp')">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp'ta Paylaş
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="copyLink()">
+                            <i class="fas fa-link me-2"></i>Linki Kopyala
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destek -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-headset me-2"></i>Destek</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Bu uygulama hakkında sorularınız mı var?</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'requestsapp:create' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-question-circle me-1"></i>Soru Sor
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'chat:start_support_chat' %}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-headset me-1"></i>Canlı Destek
+                            </a>
+                        {% else %}
+                            <a href="{% url 'pages:contact' %}" class="btn btn-outline-success btn-sm">
+                                <i class="fab fa-whatsapp me-1"></i>İletişim
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function shareApp(platform) {
+    const url = window.location.href;
+    const title = '{{ application.title }} - FxApp';
+    
+    switch(platform) {
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`);
+            break;
+        case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`);
+            break;
+    }
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Link panoya kopyalandı!');
+    });
+}
+</script>
+{% endblock %}

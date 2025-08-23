@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kariyer - Freelancer Platformu | FxApp{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);">
+    <div class="container-fluid">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4 text-white">
+                    Freelancer <span class="text-warning">Platformu</span>
+                </h1>
+                <p class="lead mb-4 text-white">
+                    Projelerinizi paylaşın, yetenekli freelancer'larla buluşun ve 
+                    birlikte başarılı işlere imza atın. FxApp Karriyer platformunda
+                    fırsatlar sizi bekliyor!
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'careers:apply' %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Freelancer Ol
+                    </a>
+                    <a href="{% url 'careers:project_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Projeleri İncele
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <svg width="400" height="300" viewBox="0 0 400 300" class="img-fluid">
+                        <!-- Freelancer illustrasyonu -->
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Laptop -->
+                        <rect x="80" y="120" width="240" height="140" rx="15" fill="url(#grad1)" opacity="0.9"/>
+                        <rect x="90" y="140" width="220" height="120" rx="8" fill="white"/>
+                        <!-- Ekran -->
+                        <rect x="100" y="150" width="200" height="100" rx="5" fill="#1a1a2e"/>
+                        <!-- Kod satırları -->
+                        <rect x="110" y="160" width="60" height="4" fill="#16d9e3"/>
+                        <rect x="110" y="170" width="80" height="4" fill="#f9ca24"/>
+                        <rect x="110" y="180" width="50" height="4" fill="#6c5ce7"/>
+                        <rect x="110" y="190" width="90" height="4" fill="#a29bfe"/>
+                        <!-- Kişi -->
+                        <circle cx="200" cy="80" r="25" fill="#ffeaa7"/>
+                        <rect x="185" y="100" width="30" height="40" rx="15" fill="#74b9ff"/>
+                        <!-- İkonlar -->
+                        <circle cx="300" cy="60" r="15" fill="#00b894" opacity="0.8"/>
+                        <circle cx="330" cy="90" r="12" fill="#fd79a8" opacity="0.8"/>
+                        <circle cx="70" cy="70" r="18" fill="#fdcb6e" opacity="0.8"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- İstatistikler -->
+<section class="py-5 bg-light">
+    <div class="container-fluid">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="content-section">
+                    <div class="display-4 fw-bold text-primary mb-2">{{ stats.total_freelancers }}+</div>
+                    <h5 class="text-muted">Aktif Freelancer</h5>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="content-section">
+                    <div class="display-4 fw-bold text-success mb-2">{{ stats.total_projects }}+</div>
+                    <h5 class="text-muted">Yayında Proje</h5>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="content-section">
+                    <div class="display-4 fw-bold text-warning mb-2">{{ stats.total_offers }}+</div>
+                    <h5 class="text-muted">Alınan Teklif</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Öne Çıkan Freelancer'lar -->
+{% if featured_freelancers %}
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>Öne Çıkan Freelancer'lar
+                </h2>
+                <p class="lead text-muted">En yetenekli ve deneyimli freelancer'larımızla tanışın</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for freelancer in featured_freelancers %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        {% if freelancer.profile_image %}
+                            <img src="{{ freelancer.profile_image.url }}" 
+                                 alt="{{ freelancer.application.full_name }}"
+                                 class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x text-white"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <h5 class="card-title">{{ freelancer.application.full_name }}</h5>
+                        <p class="text-muted mb-2">{{ freelancer.application.title }}</p>
+                        
+                        <div class="d-flex justify-content-center align-items-center mb-3">
+                            <div class="text-warning me-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= freelancer.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">({{ freelancer.rating|floatformat:1 }})</small>
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Projeler</small>
+                                <strong>{{ freelancer.total_projects }}</strong>
+                            </div>
+                            <div class="col-6">
+                                {% if freelancer.hourly_rate %}
+                                    <small class="text-muted d-block">Saatlik</small>
+                                    <strong>{{ freelancer.hourly_rate|floatformat:0 }} ₺</strong>
+                                {% else %}
+                                    <small class="text-muted d-block">Durum</small>
+                                    <strong class="text-success">Müsait</strong>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if freelancer.is_available %}
+                            <span class="badge bg-success mb-3">Çalışmaya Uygun</span>
+                        {% endif %}
+                        
+                        <a href="{{ freelancer.get_absolute_url }}" class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>Profili Görüntüle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center">
+            <a href="{% url 'careers:freelancer_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-users me-2"></i>Tüm Freelancer'ları Görüntüle
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Öne Çıkan Projeler -->
+{% if featured_projects %}
+<section class="py-5 bg-light">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-rocket text-primary me-2"></i>Öne Çıkan Projeler
+                </h2>
+                <p class="lead text-muted">En popüler ve güncel projelerimizi keşfedin</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for project in featured_projects %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if project.featured_image %}
+                        <img src="{{ project.featured_image.url }}" class="card-img-top" 
+                             alt="{{ project.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-primary d-flex align-items-center justify-content-center"
+                             style="height: 200px;">
+                            <i class="fas fa-code fa-3x text-white"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ project.title|truncatechars:50 }}</h5>
+                            <span class="badge bg-warning">Öne Çıkan</span>
+                        </div>
+                        
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-user me-1"></i>{{ project.freelancer.application.full_name }}
+                        </p>
+                        
+                        <p class="card-text">{{ project.description|truncatechars:100 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-secondary">{{ project.get_budget_range_display }}</span>
+                            <small class="text-muted">
+                                <i class="fas fa-eye me-1"></i>{{ project.views }}
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ project.get_absolute_url }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="fas fa-eye me-1"></i>Detaylar
+                            </a>
+                            <a href="{{ project.get_absolute_url }}#offer" class="btn btn-success btn-sm">
+                                <i class="fas fa-handshake me-1"></i>Teklif Ver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center">
+            <a href="{% url 'careers:project_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-folder-open me-2"></i>Tüm Projeleri Görüntüle
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Proje Kategorileri -->
+{% if categories %}
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-th-large text-success me-2"></i>Proje Kategorileri
+                </h2>
+                <p class="lead text-muted">Uzmanlık alanınıza uygun projeleri bulun</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="{{ category.icon }} fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text text-muted">{{ category.description|truncatechars:80 }}</p>
+                        <a href="{% url 'careers:project_list' %}?category={{ category.slug }}" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-right me-1"></i>Projeleri Gör
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-center text-white py-5">
+                        <h3 class="fw-bold mb-3">Freelancer Olmaya Hazır mısınız?</h3>
+                        <p class="lead mb-4">
+                            Yeteneklerinizi sergilemek ve projelerinizi paylaşmak için FxApp Kariyer 
+                            platformuna katılın. Başvurunuz onaylandıktan sonra kendi profilinizi 
+                            oluşturabilir ve teklif alabilirsiniz.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'careers:apply' %}" class="btn btn-light btn-lg">
+                                <i class="fas fa-pen me-2"></i>Hemen Başvur
+                            </a>
+                            <a href="{% url 'careers:freelancer_list' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-users me-2"></i>Freelancer'ları İncele
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

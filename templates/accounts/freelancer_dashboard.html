@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Freelancer Dashboard - FxApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-4">
+            <div class="dashboard-sidebar">
+                <div class="user-info mb-4">
+                    <div class="text-center">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" class="rounded-circle mb-2" width="80" height="80">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x text-white"></i>
+                            </div>
+                        {% endif %}
+                        <h5 class="mb-1">{{ user.get_full_name }}</h5>
+                        <p class="text-muted">{{ freelancer_profile.title }}</p>
+                        <div class="rating mb-2">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= freelancer_profile.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ms-1">({{ freelancer_profile.rating }}/5)</span>
+                        </div>
+                        <span class="badge bg-{% if freelancer_profile.is_available %}success{% else %}secondary{% endif %}">
+                            {% if freelancer_profile.is_available %}Müsait{% else %}Meşgul{% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <nav class="dashboard-nav">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'accounts:freelancer_dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:freelancer_profile_edit' %}">
+                                <i class="fas fa-user-edit me-2"></i>Profili Düzenle
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'careers:project_create' %}">
+                                <i class="fas fa-plus me-2"></i>Yeni Proje Oluştur
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#projects">
+                                <i class="fas fa-project-diagram me-2"></i>Projelerim
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'chat:chat_list' %}">
+                                <i class="fas fa-comments me-2"></i>Mesajlar
+                                {% if stats.unread_messages > 0 %}
+                                    <span class="badge bg-danger rounded-pill">{{ stats.unread_messages }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#earnings">
+                                <i class="fas fa-money-bill-wave me-2"></i>Kazançlar
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-8">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ stats.total_projects }}</h3>
+                            <p>Toplam Proje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ stats.completed_projects }}</h3>
+                            <p>Tamamlanan</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ stats.active_projects }}</h3>
+                            <p>Aktif Proje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-info">
+                            <i class="fas fa-lira-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ stats.total_earnings|default:0 }}</h3>
+                            <p>Toplam Kazanç</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="content-section">
+                        <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Hızlı Aksiyonlar</h5>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="{% url 'careers:project_create' %}" class="quick-action-card">
+                                    <div class="quick-action-icon bg-primary">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div class="quick-action-info">
+                                        <h6>Yeni Proje</h6>
+                                        <p>Portföyünüze proje ekleyin</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{% url 'accounts:freelancer_profile_edit' %}" class="quick-action-card">
+                                    <div class="quick-action-icon bg-success">
+                                        <i class="fas fa-user-edit"></i>
+                                    </div>
+                                    <div class="quick-action-info">
+                                        <h6>Profili Düzenle</h6>
+                                        <p>Bilgilerinizi güncelleyin</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{% url 'chat:chat_list' %}" class="quick-action-card">
+                                    <div class="quick-action-icon bg-info">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <div class="quick-action-info">
+                                        <h6>Mesajlar</h6>
+                                        <p>Müşterilerinizle iletişim</p>
+                                        {% if stats.unread_messages > 0 %}
+                                            <span class="badge bg-danger">{{ stats.unread_messages }}</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{% url 'accounts:freelancer_public_profile' user.id %}" class="quick-action-card" target="_blank">
+                                    <div class="quick-action-icon bg-warning">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <div class="quick-action-info">
+                                        <h6>Profilimi Görüntüle</h6>
+                                        <p>Herkese açık profiliniz</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Projects -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4><i class="fas fa-project-diagram me-2"></i>Son Projeler</h4>
+                            <a href="{% url 'careers:project_create' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>Yeni Proje
+                            </a>
+                        </div>
+                        
+                        {% if recent_projects %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Proje</th>
+                                            <th>Durum</th>
+                                            <th>Bütçe</th>
+                                            <th>Tarih</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for project in recent_projects %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ project.title }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ project.description|truncatechars:50 }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{% if project.status == 'published' %}success{% elif project.status == 'draft' %}warning{% else %}info{% endif %}">
+                                                    {{ project.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ project.get_budget_range_display }}</td>
+                                            <td>{{ project.created_at|date:"d M Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'careers:project_detail' project.slug %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Henüz proje bulunmuyor</h5>
+                                <p class="text-muted">İlk projenizi oluşturun ve müşteriler tarafından keşfedilmeye başlayın.</p>
+                                <a href="#" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>İlk Projenizi Oluşturun
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Messages -->
+                <div class="col-lg-4">
+                    <div class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4><i class="fas fa-comments me-2"></i>Son Mesajlar</h4>
+                            <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-primary btn-sm">Tümünü Gör</a>
+                        </div>
+                        
+                        {% if recent_chats %}
+                            {% for chat in recent_chats %}
+                            <div class="chat-item">
+                                <div class="d-flex align-items-center">
+                                    {% with other_user=chat.get_other_participant %}
+                                        {% if other_user.avatar %}
+                                            <img src="{{ other_user.avatar.url }}" class="rounded-circle me-2" width="40" height="40">
+                                        {% else %}
+                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <h6 class="mb-0">{{ other_user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ chat.updated_at|timesince }}</small>
+                                            </div>
+                                            {% with last_message=chat.get_last_message %}
+                                                {% if last_message %}
+                                                    <p class="mb-0 text-muted small">{{ last_message.content|truncatechars:40 }}</p>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                    {% endwith %}
+                                </div>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-comments fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">Henüz mesaj bulunmuyor</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.quick-action-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: inherit;
+    border-color: #007bff;
+}
+
+.quick-action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.quick-action-info h6 {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.quick-action-info p {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.dashboard-sidebar {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.dashboard-nav .nav-link {
+    color: #6c757d;
+    padding: 12px 16px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-nav .nav-link:hover,
+.dashboard-nav .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.content-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.chat-item {
+    padding: 10px 0;
+}
+
+.rating {
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

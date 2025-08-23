@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}İletişim Mesajları - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    <i class="fas fa-envelope text-primary me-2"></i>İletişim Mesajları
+                </h1>
+                <a href="{% url 'pages:admin_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Dashboard'a Dön
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtreler -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Durum Filtresi</label>
+                            <select name="status" class="form-select">
+                                <option value="">Tümü</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-1"></i>Filtrele
+                            </button>
+                            <a href="{% url 'pages:admin_contact_messages' %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Temizle
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mesajlar Listesi -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if messages %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Durum</th>
+                                        <th>Ad Soyad</th>
+                                        <th>E-posta</th>
+                                        <th>Konu</th>
+                                        <th>Tarih</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for message in messages %}
+                                    <tr class="{% if message.is_urgent %}table-warning{% endif %}">
+                                        <td>
+                                            <span class="badge bg-{% if message.status == 'new' %}danger{% elif message.status == 'read' %}warning{% elif message.status == 'replied' %}success{% else %}secondary{% endif %}">
+                                                {% if message.status == 'new' %}Yeni{% elif message.status == 'read' %}Okundu{% elif message.status == 'replied' %}Cevaplandı{% else %}Kapatıldı{% endif %}
+                                            </span>
+                                            {% if message.is_urgent %}
+                                                <i class="fas fa-exclamation-triangle text-warning ms-1" title="Acil"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ message.name }}</td>
+                                        <td>
+                                            <a href="mailto:{{ message.email }}" class="text-decoration-none">
+                                                {{ message.email }}
+                                            </a>
+                                        </td>
+                                        <td>{{ message.subject|truncatechars:50 }}</td>
+                                        <td>{{ message.created_at|date:"d M Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'pages:admin_contact_message_detail' pk=message.pk %}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Görüntüle
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="Sayfa navigasyonu">
+                            <ul class="pagination justify-content-center mt-4">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i> Önceki
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        Sonraki <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Henüz Mesaj Yok</h4>
+                            <p class="text-muted">
+                                {% if status_filter %}
+                                Bu durum için mesaj bulunamadı.
+                                {% else %}
+                                Henüz hiç iletişim formu mesajı gelmemiş.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-warning {
+    --bs-table-bg: #fff3cd;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.table-hover > tbody > tr:hover > td {
+    background-color: rgba(0, 0, 0, 0.025);
+}
+</style>
+{% endblock %}
