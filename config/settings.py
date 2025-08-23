@@ -250,9 +250,9 @@ else:
     # Development Email Settings
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Contact Settings
-DEFAULT_FROM_EMAIL = 'noreply@apphane.com.tr'
-CONTACT_EMAIL = 'admin@apphane.com.tr'  # İletişim formundan gelen mesajların gönderileceği e-posta
+# Contact Settings - Gmail SMTP kullanarak profesyonel e-posta
+DEFAULT_FROM_EMAIL = 'Apphane Team <apphane.platform@gmail.com>'  # Gmail üzerinden gönderim
+CONTACT_EMAIL = 'apphane.platform@gmail.com'  # İletişim formlarından gelen mesajlar buraya gelecek
 
 
 # Security Settings for Production
