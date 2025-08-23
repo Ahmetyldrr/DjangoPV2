@@ -2,12 +2,53 @@
 
 Django project for apphane.com.tr
 
-🚀 **Status: CI/CD Pipeline Active!**
+🚀 **Status: Production Ready with CI/CD!**
 
+## 🌐 Live Site
+- **URL**: http://165.227.130.23
+- **Admin**: http://165.227.130.23/admin/
+- **Health Check**: http://165.227.130.23/health/
 
+## 🔧 Quick Commands
 
+### Manual Deployment:
+```bash
+ssh root@165.227.130.23
+cd /var/www/apphane
+./deploy_script.sh
+```
 
-- **Deploy Status**: Testing automatic deployment
-- **Last Update**: 23 Ağustos 2025
-- **Environment**: Production Ready
+### Quick Test:
+```bash
+./quick_test.sh
+```
+
+### Logs:
+```bash
+docker-compose logs -f
+```
+
+## 📋 CI/CD Pipeline
+- **Trigger**: Push to main branch
+- **Tests**: Automatic Django tests
+- **Deploy**: Automatic deployment to server
+- **Health Check**: Automatic verification
+
+## ✅ Fixed Issues
+1. ✅ Dockerfile gunicorn command simplified
+2. ✅ Docker-compose health checks fixed
+3. ✅ Nginx dependency issues resolved
+4. ✅ SSL complexity removed for stability
+5. ✅ CI/CD pipeline optimized
+
+## 🏗️ Architecture
+- **Web**: Django + Gunicorn (Port 80)
+- **Database**: PostgreSQL (External)
+- **Cache**: Redis (Port 9379)
+- **Deploy**: Docker Compose + GitHub Actions
+
+---
+
+**Last Update**: 24 Ağustos 2025  
+**Environment**: Production Ready
 

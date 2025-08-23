@@ -1,6 +1,106 @@
-# GitHub Actions TAMAMEN DEVRE DIŞI
-# Bu dosya boş bırakıldı - hiçbir action çalışmayacak
-# Manuel deployment kullanılıyor
+name: Deploy to Production
 
-# ÖNCEKİ WORKFLOW'U AKTİF ETMEK İÇİN
-# Bu satırları silin ve aşağıdaki gerçek workflow kodunu geri ekleyin
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install Django psycopg2-binary requests django-allauth PyJWT cryptography oauthlib requests-oauthlib python3-openid
+        pip install -r requirements.txt || true
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost/test_db
+      run: |
+        python manage.py test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: 165.227.130.23
+        username: root
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/apphane
+          
+          # Git güncellemesi
+          git stash
+          git pull origin main
+          
+          # Basit Docker Compose kullan
+          cp docker-compose-simple.yml docker-compose.yml
+          
+          # Graceful shutdown
+          docker-compose down --timeout 30
+          
+          # Cache temizliği (sorun olursa)
+          docker system prune -f
+          
+          # Clean build
+          docker-compose build --no-cache web
+          
+          # Start services
+          docker-compose up -d
+          
+          # Wait for services to be healthy (maksimum 5 dakika)
+          timeout 300 bash -c 'until curl -f http://localhost:80/health/ > /dev/null 2>&1; do echo "Waiting for web service..."; sleep 10; done'
+          
+          # Run migrations
+          docker-compose exec -T web python manage.py migrate --noinput
+          
+          # Collect static files
+          docker-compose exec -T web python manage.py collectstatic --noinput --clear
+          
+          # Final verification
+          curl -f http://localhost:80/health/ || exit 1
+          
+          echo "✅ Deployment completed successfully!"
+
+  notify:
+    needs: [test, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notification
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
+          echo "🚀 Deployment successful! Site is live at http://165.227.130.23"
+        else
+          echo "❌ Deployment failed!"
+          exit 1
+        fi
