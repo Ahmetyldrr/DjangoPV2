@@ -254,6 +254,7 @@ else:
 DEFAULT_FROM_EMAIL = 'noreply@apphane.com.tr'
 CONTACT_EMAIL = 'admin@apphane.com.tr'  # İletişim formundan gelen mesajların gönderileceği e-posta
 
+
 # Security Settings for Production
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
