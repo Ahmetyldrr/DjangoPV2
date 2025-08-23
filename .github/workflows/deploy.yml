@@ -77,7 +77,7 @@ jobs:
           docker-compose exec -T web python manage.py collectstatic --noinput --clear
           
           # Verify deployment
-          curl -f http://localhost:9080/health/ || exit 1
+          curl -f http://localhost:8000/health/ || exit 1
           
           echo "✅ Deployment completed successfully!"
 
@@ -90,7 +90,7 @@ jobs:
     - name: Notification
       run: |
         if [ "${{ needs.deploy.result }}" == "success" ]; then
-          echo "🚀 Deployment successful! Site is live at http://165.227.130.23:9080"
+          echo "🚀 Deployment successful! Site is live at http://165.227.130.23:8000"
         else
           echo "❌ Deployment failed!"
           exit 1
