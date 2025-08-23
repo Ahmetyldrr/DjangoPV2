@@ -266,6 +266,6 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     
-    # CSRF Settings
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
+    # CSRF Settings - HTTP için False
+    CSRF_COOKIE_SECURE = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() == 'true'
+    SESSION_COOKIE_SECURE = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() == 'true'
