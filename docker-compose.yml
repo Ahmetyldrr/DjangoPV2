@@ -9,7 +9,7 @@ services:
       - DEBUG=False
       - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
       - REDIS_URL=redis://redis:9379/0
-      - SECURE_SSL_REDIRECT=False
+      - SECURE_SSL_REDIRECT=True
     depends_on:
       redis:
         condition: service_healthy
@@ -41,13 +41,13 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "8000:80"
-      - "8443:443"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-ssl.conf:/etc/nginx/nginx.conf
       - static_volume:/var/www/static
       - media_volume:/var/www/media
-      - /etc/ssl/certs:/etc/ssl/certs
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       web:
         condition: service_healthy
