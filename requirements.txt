@@ -9,3 +9,14 @@ channels-redis
 django-allauth
 whitenoise
 celery
+requests
+urllib3
+certifi
+charset-normalizer
+idna
+PyJWT
+cryptography
+oauthlib
+requests-oauthlib
+python3-openid
+
