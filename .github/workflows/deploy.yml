@@ -57,8 +57,41 @@ jobs:
         script: |
           cd /var/www/apphane
           git pull origin main
-          docker-compose down
-          docker-compose build
+          
+          # Graceful shutdown
+          docker-compose down --timeout 30
+          
+          # Clean build
+          docker-compose build --no-cache
+          
+          # Start services with health checks
           docker-compose up -d
-          docker-compose exec -T web python manage.py migrate
-          docker-compose exec -T web python manage.py collectstatic --noinput
+          
+          # Wait for services to be healthy
+          timeout 300 bash -c 'until docker-compose exec web curl -f http://localhost:9000/health/ > /dev/null 2>&1; do echo "Waiting for web service..."; sleep 5; done'
+          
+          # Run migrations
+          docker-compose exec -T web python manage.py migrate --noinput
+          
+          # Collect static files
+          docker-compose exec -T web python manage.py collectstatic --noinput --clear
+          
+          # Verify deployment
+          curl -f http://localhost:9080/health/ || exit 1
+          
+          echo "✅ Deployment completed successfully!"
+
+  notify:
+    needs: [test, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notification
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
+          echo "🚀 Deployment successful! Site is live at http://165.227.130.23:9080"
+        else
+          echo "❌ Deployment failed!"
+          exit 1
+        fi
