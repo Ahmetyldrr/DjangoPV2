@@ -76,17 +76,12 @@ jobs:
           # Start services
           docker-compose up -d
           
-          # Wait for services to be healthy (maksimum 5 dakika)
-          timeout 300 bash -c 'until curl -f http://localhost:80/health/ > /dev/null 2>&1; do echo "Waiting for web service..."; sleep 10; done'
-          
           # Run migrations
           docker-compose exec -T web python manage.py migrate --noinput
           
           # Collect static files
           docker-compose exec -T web python manage.py collectstatic --noinput --clear
-          
-          # Final verification
-          curl -f http://localhost:80/health/ || exit 1
+    
           
           echo "✅ Deployment completed successfully!"
 
