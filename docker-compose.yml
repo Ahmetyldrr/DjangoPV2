@@ -9,30 +9,56 @@ services:
       - DEBUG=False
       - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
       - REDIS_URL=redis://redis:9379/0
+      - SECURE_SSL_REDIRECT=False
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   redis:
     image: redis:alpine
     ports:
       - "9379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
 
   nginx:
     image: nginx:alpine
     ports:
-      - "9080:80"
-      - "9443:443"
+      - "8000:80"
+      - "8443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - static_volume:/var/www/static
       - media_volume:/var/www/media
       - /etc/ssl/certs:/etc/ssl/certs
     depends_on:
-      - web
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   static_volume:
   media_volume:
+  redis_data:
