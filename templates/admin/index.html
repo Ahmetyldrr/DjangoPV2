@@ -5,44 +5,42 @@
     {{ block.super }}
     
     <!-- Özel Admin Kontrol Paneli -->
-    <div class="module" style="margin-top: 20px;">
-        <table summary="{% trans 'Models available in the Django administration.' %}" style="width: 100%;">
-            <caption>
-                <a href="{% url 'admin_control_center' %}" class="section" title="{% trans 'System Monitoring' %}">
-                    🚀 Sistem Kontrol Merkezi
-                </a>
-            </caption>
+    <div class="module" style="margin-top: 20px; background: #f8f9fa; border-left: 4px solid #417690;">
+        <h2 style="background: #417690; color: white; padding: 15px; margin: 0; font-size: 18px;">
+            🚀 Sistem Kontrol Merkezi
+        </h2>
+        <table summary="{% trans 'System Control Center.' %}" style="width: 100%; margin: 0;">
             <tr>
-                <th scope="row">
-                    <a href="{% url 'admin_control_center' %}" style="text-decoration: none;">
+                <th scope="row" style="width: 200px; padding: 12px;">
+                    <a href="{% url 'admin_control_center' %}" style="text-decoration: none; color: #417690;">
                         <strong>📊 Kontrol Paneli</strong>
                     </a>
                 </th>
-                <td>
+                <td style="padding: 12px;">
                     <a href="{% url 'admin_control_center' %}" class="addlink" style="padding-left: 0;">
                         Canlı mesaj takibi, sistem logları ve admin araçları
                     </a>
                 </td>
             </tr>
-            <tr>
-                <th scope="row">
-                    <a href="{% url 'admin_system_dashboard' %}" style="text-decoration: none;">
+            <tr style="background: #f0f0f0;">
+                <th scope="row" style="padding: 12px;">
+                    <a href="{% url 'admin_system_dashboard' %}" style="text-decoration: none; color: #417690;">
                         <strong>📈 Sistem Dashboard</strong>
                     </a>
                 </th>
-                <td>
+                <td style="padding: 12px;">
                     <a href="{% url 'admin_system_dashboard' %}" class="addlink" style="padding-left: 0;">
                         Sistem performansı ve detaylı loglar
                     </a>
                 </td>
             </tr>
             <tr>
-                <th scope="row">
-                    <a href="{% url 'admin_test_email' %}" style="text-decoration: none;">
+                <th scope="row" style="padding: 12px;">
+                    <a href="{% url 'admin_test_email' %}" style="text-decoration: none; color: #417690;">
                         <strong>📧 Email Test</strong>
                     </a>
                 </th>
-                <td>
+                <td style="padding: 12px;">
                     <a href="{% url 'admin_test_email' %}" class="addlink" style="padding-left: 0;">
                         Email sistem testi ve doğrulama
                     </a>

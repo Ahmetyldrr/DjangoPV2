@@ -1,0 +1,90 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<div id="nav-global" style="background: #417690; padding: 10px 0;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
+        <!-- Sol taraf - Ana linkler -->
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="{% url 'admin:index' %}" style="color: white; text-decoration: none; font-weight: bold;">
+                🏠 Ana Sayfa
+            </a>
+            
+            <a href="{% url 'admin_control_center' %}" style="color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 5px;">
+                📊 Kontrol Merkezi
+            </a>
+            
+            <a href="{% url 'admin_system_dashboard' %}" style="color: white; text-decoration: none; font-weight: bold;">
+                📈 Sistem Dashboard
+            </a>
+            
+            <a href="{% url 'admin_test_email' %}" style="color: white; text-decoration: none; font-weight: bold;">
+                📧 Email Test
+            </a>
+        </div>
+        
+        <!-- Orta - Hızlı erişim -->
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <a href="/admin/chat/message/" style="color: white; text-decoration: none; font-size: 14px;">
+                💬 Mesajlar
+            </a>
+            
+            <a href="/admin/accounts/user/" style="color: white; text-decoration: none; font-size: 14px;">
+                👥 Kullanıcılar
+            </a>
+            
+            <a href="/admin/chat/projectoffer/" style="color: white; text-decoration: none; font-size: 14px;">
+                🎯 Teklifler
+            </a>
+        </div>
+        
+        <!-- Sağ taraf - Kullanıcı bilgileri -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            {% if user.is_authenticated %}
+                <span style="color: white; font-size: 14px;">
+                    👤 {{ user.username }}
+                </span>
+                <a href="{% url 'admin:logout' %}" style="color: #ffc13b; text-decoration: none; font-size: 14px;">
+                    🚪 Çıkış
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mobil uyumluluk -->
+<style>
+    @media (max-width: 1024px) {
+        #nav-global > div {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+        
+        #nav-global > div > div {
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        #nav-global a {
+            font-size: 12px !important;
+            padding: 5px 10px !important;
+        }
+        
+        #nav-global > div > div {
+            gap: 5px;
+        }
+    }
+</style>
+{% endblock %}
