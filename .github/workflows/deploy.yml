@@ -62,10 +62,10 @@ jobs:
           git stash
           git pull origin main
           
-          # Basit Docker Compose kullan
+          # Nginx-uyumlu Docker Compose kullan (port 9000:9000)
           cp docker-compose-simple.yml docker-compose.yml
           
-          # Graceful shutdown
+          # Graceful shutdown (Nginx'i etkilemez)
           docker-compose down --timeout 30
           
           # Cache temizliği (sorun olursa)
@@ -82,6 +82,10 @@ jobs:
           
           # Collect static files
           docker-compose exec -T web python manage.py collectstatic --noinput --clear
+          
+          # Copy static files to host for Nginx (HTTPS compatibility)
+          docker cp apphane_web_1:/app/staticfiles/. /var/www/apphane/staticfiles/ 2>/dev/null || true
+          docker cp apphane_web_1:/app/media/. /var/www/apphane/media/ 2>/dev/null || true
     
           
           echo "✅ Deployment completed successfully!"
@@ -95,7 +99,7 @@ jobs:
     - name: Notification
       run: |
         if [ "${{ needs.deploy.result }}" == "success" ]; then
-          echo "🚀 Deployment successful! Site is live at http://165.227.130.23"
+          echo "🚀 Deployment successful! Site is live at https://apphane.com.tr"
         else
           echo "❌ Deployment failed!"
           exit 1

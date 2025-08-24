@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "80:9000"  # HTTP direkt Django'ya
+      - "9000:9000"  # HTTP direkt Django'ya (Nginx port 80, 443'ü alır)
     environment:
       - DEBUG=False
       - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb

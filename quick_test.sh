@@ -22,7 +22,7 @@ fi
 
 # 2. Health check
 echo -n "Health check: "
-if curl -s -f http://localhost:80/health/ > /dev/null; then
+if curl -s -f http://localhost:9000/health/ > /dev/null; then
     echo -e "${GREEN}✅ Başarılı${NC}"
 else
     echo -e "${RED}❌ Başarısız${NC}"
@@ -30,7 +30,7 @@ fi
 
 # 3. Admin panel
 echo -n "Admin panel: "
-ADMIN_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/admin/)
+ADMIN_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/admin/)
 if [ "$ADMIN_CODE" = "200" ] || [ "$ADMIN_CODE" = "302" ]; then
     echo -e "${GREEN}✅ Erişilebilir (HTTP $ADMIN_CODE)${NC}"
 else
@@ -60,7 +60,7 @@ docker-compose ps
 
 echo ""
 echo "Health check response:"
-curl -s http://localhost:80/health/ | python3 -m json.tool 2>/dev/null || curl -s http://localhost:80/health/
+curl -s http://localhost:9000/health/ | python3 -m json.tool 2>/dev/null || curl -s http://localhost:9000/health/
 
 echo ""
 echo "🔚 Test tamamlandı!"

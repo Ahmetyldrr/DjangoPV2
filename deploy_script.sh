@@ -47,7 +47,7 @@ docker-compose up -d
 
 # 8. Servislerin hazır olmasını bekle
 echo -e "${BLUE}8. Servislerin hazır olması bekleniyor (max 5 dakika)...${NC}"
-timeout 300 bash -c 'until curl -f http://localhost:80/health/ > /dev/null 2>&1; do echo "Web servisi bekleniyor..."; sleep 10; done'
+timeout 300 bash -c 'until curl -f http://localhost:9000/health/ > /dev/null 2>&1; do echo "Web servisi bekleniyor..."; sleep 10; done'
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Web servisi hazır!${NC}"
@@ -64,9 +64,14 @@ docker-compose exec -T web python manage.py migrate --noinput
 echo -e "${BLUE}10. Static files toplanıyor...${NC}"
 docker-compose exec -T web python manage.py collectstatic --noinput --clear
 
+# 10.1. Static dosyaları host'a kopyala (Nginx için)
+echo -e "${BLUE}10.1. Static dosyalar Nginx için kopyalanıyor...${NC}"
+docker cp apphane_web_1:/app/staticfiles/. /var/www/apphane/staticfiles/ 2>/dev/null || true
+docker cp apphane_web_1:/app/media/. /var/www/apphane/media/ 2>/dev/null || true
+
 # 11. Final verification
 echo -e "${BLUE}11. Final kontrol yapılıyor...${NC}"
-if curl -f http://localhost:80/health/ > /dev/null 2>&1; then
+if curl -f http://localhost:9000/health/ > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Deployment başarılı!${NC}"
 else
     echo -e "${RED}❌ Final kontrol başarısız!${NC}"

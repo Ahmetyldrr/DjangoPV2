@@ -5,9 +5,10 @@ Django project for apphane.com.tr
 🚀 **Status: Production Ready with CI/CD!**
 
 ## 🌐 Live Site
-- **URL**: http://165.227.130.23
-- **Admin**: http://165.227.130.23/admin/
-- **Health Check**: http://165.227.130.23/health/
+- **URL**: https://apphane.com.tr
+- **Admin**: https://apphane.com.tr/admin/
+- **Health Check**: https://apphane.com.tr/health/
+- **Direct Django**: http://165.227.130.23:9000 (Backend only)
 
 ## 🔧 Quick Commands
 
