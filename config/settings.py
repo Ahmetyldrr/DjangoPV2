@@ -331,6 +331,12 @@ if not DEBUG:
 
 
 # Logging Configuration
+import os
+
+# Logs klasörünü oluştur (eğer yoksa)
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -352,13 +358,13 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
             'formatter': 'verbose',
         },
         'chat_email_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'chat_emails.log'),
+            'filename': os.path.join(LOGS_DIR, 'chat_emails.log'),
             'formatter': 'chat_email',
         },
         'console': {
@@ -374,24 +380,31 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],  # Sadece console, dosya problemi yaşanmasın
             'level': 'INFO',
             'propagate': True,
         },
         'chat.email_notifications': {
-            'handlers': ['chat_email_file', 'console'],
+            'handlers': ['console'],  # Development'ta console yeterli
             'level': 'DEBUG',
             'propagate': False,
         },
         'chat.signals': {
-            'handlers': ['chat_email_file', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'django.core.mail': {
-            'handlers': ['chat_email_file', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
+
+# Production'da file logging'i aktif et
+if not DEBUG:
+    LOGGING['loggers']['django']['handlers'] = ['file', 'console']
+    LOGGING['loggers']['chat.email_notifications']['handlers'] = ['chat_email_file', 'console']
+    LOGGING['loggers']['chat.signals']['handlers'] = ['chat_email_file', 'console']
+    LOGGING['loggers']['django.core.mail']['handlers'] = ['chat_email_file', 'console']

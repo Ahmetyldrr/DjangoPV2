@@ -2,10 +2,12 @@ from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.conf import settings
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
 import os
 import json
 from datetime import datetime, timedelta
-from chat.models import Message, ChatRoom
+from chat.models import Message, ChatRoom, ProjectOffer
 from django.contrib.auth import get_user_model
 
 User = get_user_model()

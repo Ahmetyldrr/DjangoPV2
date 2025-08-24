@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from .models import ChatRoom, Message, ProjectOffer
 from .email_notifications import (
     send_new_message_notification,
@@ -25,15 +26,25 @@ class ChatRoomAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ['sender', 'room', 'message_type', 'content_preview', 'is_read', 'created_at']
-    list_filter = ['message_type', 'is_read', 'created_at']
-    search_fields = ['sender__email', 'content', 'room__name']
+    list_display = ['sender', 'room', 'message_type', 'content_preview', 'is_read', 'created_at', 'room_participants']
+    list_filter = ['message_type', 'is_read', 'created_at', 'sender__user_type']
+    search_fields = ['sender__email', 'sender__first_name', 'sender__last_name', 'content', 'room__name']
     readonly_fields = ['created_at', 'updated_at', 'read_at']
-    actions = ['send_notification_manually']
+    actions = ['send_notification_manually', 'mark_as_read', 'export_messages']
+    list_per_page = 50
+    date_hierarchy = 'created_at'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('sender', 'room').prefetch_related('room__participants')
     
     def content_preview(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
     content_preview.short_description = 'İçerik'
+    
+    def room_participants(self, obj):
+        participants = obj.room.participants.all()
+        return ' | '.join([p.get_full_name() for p in participants])
+    room_participants.short_description = 'Katılımcılar'
     
     def send_notification_manually(self, request, queryset):
         """Admin tarafından manuel olarak bildirim gönder"""
@@ -48,6 +59,20 @@ class MessageAdmin(admin.ModelAdmin):
             messages.warning(request, "Hiçbir bildirim gönderilemedi.")
     
     send_notification_manually.short_description = "Seçili mesajlar için bildirim gönder"
+    
+    def mark_as_read(self, request, queryset):
+        """Mesajları okundu olarak işaretle"""
+        updated = queryset.update(is_read=True, read_at=timezone.now())
+        messages.success(request, f"{updated} mesaj okundu olarak işaretlendi.")
+    
+    mark_as_read.short_description = "Okundu olarak işaretle"
+    
+    def export_messages(self, request, queryset):
+        """Mesajları CSV olarak export et"""
+        # Bu fonksiyon ayrı implement edilecek
+        messages.info(request, "Export özelliği yakında eklenecek.")
+    
+    export_messages.short_description = "CSV olarak export et"
 
 
 @admin.register(ProjectOffer)
