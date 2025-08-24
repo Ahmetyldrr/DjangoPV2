@@ -3,19 +3,22 @@ version: '3.8'
 services:
   web:
     build: .
+    container_name: django_web
     ports:
-      - "9000:9000"  # HTTP direkt Django'ya (Nginx port 80, 443'ü alır)
+      - "9000:9000"
     environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
       - DEBUG=False
+      - ALLOWED_HOSTS=apphane.com.tr,165.227.130.23,localhost,127.0.0.1
       - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
-      - REDIS_URL=redis://redis:9379/0
-      - SECURE_SSL_REDIRECT=False
-    depends_on:
-      redis:
-        condition: service_healthy
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - ./:/app
+      - ./media:/app/media
+      - ./static:/app/static
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:9000 --workers 3 --timeout 120 --log-level info"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health/"]
@@ -23,22 +26,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "9379:6379"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-
-volumes:
-  static_volume:
-  media_volume:
-  redis_data:
