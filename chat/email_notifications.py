@@ -9,6 +9,97 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+def send_admin_reply_notification(user, reply_text, original_message):
+    """Admin yanıtı email bildirimi"""
+    try:
+        subject = "🔔 Mesajınıza Admin Yanıtı - AppHane"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }}
+                .header h1 {{ margin: 0; font-size: 24px; }}
+                .content {{ padding: 30px; }}
+                .message-box {{ background: #f8f9fa; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0; border-radius: 4px; }}
+                .reply-box {{ background: #e8f5e8; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0; border-radius: 4px; }}
+                .footer {{ background: #333; color: white; padding: 20px; text-align: center; font-size: 14px; }}
+                .btn {{ display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin: 10px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>💬 Admin Yanıtı Aldınız!</h1>
+                </div>
+                <div class="content">
+                    <p>Merhaba <strong>{user.get_full_name() or user.username}</strong>,</p>
+                    
+                    <p>Gönderdiğiniz mesaja admin yanıtı geldi:</p>
+                    
+                    <div class="message-box">
+                        <strong>📝 Orijinal Mesajınız:</strong><br>
+                        {original_message[:200]}{'...' if len(original_message) > 200 else ''}
+                    </div>
+                    
+                    <div class="reply-box">
+                        <strong>💬 Admin Yanıtı:</strong><br>
+                        {reply_text}
+                    </div>
+                    
+                    <p>Mesajlaşmaya devam etmek için site üzerinden giriş yapabilirsiniz.</p>
+                    
+                    <a href="https://apphane.com.tr/chat/" class="btn">💬 Mesajlara Git</a>
+                </div>
+                <div class="footer">
+                    <p>Bu email otomatik olarak gönderilmiştir.</p>
+                    <p><strong>AppHane</strong> - apphane.com.tr</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        text_content = f"""
+        AppHane - Admin Yanıtı
+        
+        Merhaba {user.get_full_name() or user.username},
+        
+        Gönderdiğiniz mesaja admin yanıtı geldi:
+        
+        Orijinal Mesajınız:
+        {original_message[:200]}{'...' if len(original_message) > 200 else ''}
+        
+        Admin Yanıtı:
+        {reply_text}
+        
+        Mesajlaşmaya devam etmek için: https://apphane.com.tr/chat/
+        
+        Bu email otomatik olarak gönderilmiştir.
+        AppHane - apphane.com.tr
+        """
+        
+        send_mail(
+            subject=subject,
+            message=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_content,
+            fail_silently=False,
+        )
+        
+        logger.info(f"Admin yanıt email bildirimi gönderildi: {user.email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Admin yanıt email gönderme hatası: {e}")
+        return False
+
+
 def send_new_message_notification(message):
     """
     Yeni mesaj geldiğinde admin'lere email bildirim gönder

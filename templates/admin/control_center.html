@@ -244,6 +244,7 @@
                         </span>
                         <div style="margin-top: 5px;">
                             <button class="btn-action" onclick="viewMessage({{ message.id }})">👁️</button>
+                            <button class="btn-action" onclick="replyMessage({{ message.id }}, '{{ message.sender.get_full_name|escapejs }}')">💬 Yanıtla</button>
                             <button class="btn-action btn-warning" onclick="markRead({{ message.id }})">📖</button>
                             <button class="btn-action btn-danger" onclick="deleteMessage({{ message.id }})">🗑️</button>
                         </div>
@@ -515,6 +516,63 @@ function sendBroadcast() {
         } else {
             alert('❌ Hata: ' + data.error);
         }
+    });
+}
+
+// Mesaja yanıt verme
+function replyMessage(messageId, senderName) {
+    const replyText = prompt(`${senderName} kullanıcısına yanıt verin:`);
+    if (!replyText || replyText.trim() === '') {
+        return;
+    }
+    
+    if (!confirm(`"${senderName}" kullanıcısına yanıt göndermek istediğinizden emin misiniz?`)) {
+        return;
+    }
+    
+    fetch('{% url "admin_api_message_actions" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'reply',
+            message_ids: [messageId],
+            reply_text: replyText.trim()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Yanıt gönderildi ve email bildirimi yapıldı!');
+            refreshMessages();
+        } else {
+            alert('❌ Hata: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Bir hata oluştu: ' + error.message);
+    });
+}
+
+// Mesaj görüntüleme
+function viewMessage(messageId) {
+    // Mesaj detaylarını getir ve modal ile göster
+    fetch(`/admin/api/message-detail/${messageId}/`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const message = data.message;
+            alert(`Mesaj Detayı:\n\nGönderen: ${message.sender}\nTarih: ${message.date}\nİçerik: ${message.content}`);
+        } else {
+            alert('❌ Mesaj detayı alınamadı');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Bir hata oluştu');
     });
 }
 

@@ -250,6 +250,45 @@ def api_message_actions(request):
             deleted, _ = messages.delete()
             return JsonResponse({'success': True, 'deleted': deleted})
         
+        elif action == 'reply':
+            # Admin yanıtlama özelliği
+            reply_text = request.POST.get('reply_text', '').strip()
+            if not reply_text:
+                return JsonResponse({'error': 'Yanıt metni gerekli'}, status=400)
+            
+            # İlk mesajı al (yanıt vermek için)
+            first_message = messages.first()
+            if not first_message:
+                return JsonResponse({'error': 'Mesaj bulunamadı'}, status=404)
+            
+            # Admin yanıtı oluştur
+            reply_message = Message.objects.create(
+                room=first_message.room,
+                sender=request.user,  # Admin kullanıcısı
+                content=f"[ADMIN YANITLADI]: {reply_text}",
+                message_type='admin_reply'
+            )
+            
+            # Log kaydı
+            import logging
+            logger = logging.getLogger('django')
+            logger.info(f"ADMIN_REPLY: Admin yanıt verdi - Mesaj ID: {first_message.id}, Admin: {request.user.username}, Yanıt: {reply_text}")
+            
+            # Email bildirimi gönder
+            try:
+                from chat.email_notifications import send_admin_reply_notification
+                send_admin_reply_notification(first_message.sender, reply_text, first_message.content)
+                email_sent = True
+            except Exception as e:
+                logger.error(f"Email gönderme hatası: {e}")
+                email_sent = False
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Yanıt gönderildi' + (' ve email bildirimi yapıldı' if email_sent else ''),
+                'reply_id': reply_message.id
+            })
+            
         elif action == 'export':
             # CSV export fonksiyonu
             import csv
