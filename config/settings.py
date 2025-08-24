@@ -328,3 +328,70 @@ if not DEBUG:
     # CSRF Settings - HTTPS için True
     CSRF_COOKIE_SECURE = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
     SESSION_COOKIE_SECURE = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+        'chat_email': {
+            'format': '🔔 {asctime} [{levelname}] {module}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'formatter': 'verbose',
+        },
+        'chat_email_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'chat_emails.log'),
+            'formatter': 'chat_email',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'chat.email_notifications': {
+            'handlers': ['chat_email_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'chat.signals': {
+            'handlers': ['chat_email_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.core.mail': {
+            'handlers': ['chat_email_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

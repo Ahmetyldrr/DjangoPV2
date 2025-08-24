@@ -19,9 +19,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .health_views import health_check, readiness_check, liveness_check
+from .admin_views import system_dashboard, api_logs, test_email_system
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Admin dashboard ve API'ler
+    path('admin/system-dashboard/', system_dashboard, name='admin_system_dashboard'),
+    path('admin/api/logs/', api_logs, name='admin_api_logs'),
+    path('admin/test-email/', test_email_system, name='admin_test_email'),
     
     # Health check endpoints
     path('health/', health_check, name='health_check'),

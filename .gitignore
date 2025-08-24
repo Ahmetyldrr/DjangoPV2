@@ -187,3 +187,8 @@ test_suite/
 *_test_*.log
 *_report.txt
 *_report.md
+
+# Logs directory - Runtime logs
+logs/
+chat_emails.log
+django.log
