@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -219,15 +220,27 @@ SOCIALACCOUNT_PROVIDERS = {
 ASGI_APPLICATION = 'config.asgi.application'
 
 # Cache Configuration with Redis
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/1' if not DEBUG else 'redis://127.0.0.1:9379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+# Test ortamında Redis yoksa dummy cache kullan
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+if 'test' in sys.argv or os.environ.get('GITHUB_ACTIONS'):
+    # Test ortamında dummy cache kullan
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     }
-}
+else:
+    # Production/Development ortamında Redis kullan
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': 'redis://redis:6379/1' if not DEBUG else 'redis://127.0.0.1:9379/1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
 
 # Redis için Channels
 if not DEBUG:
