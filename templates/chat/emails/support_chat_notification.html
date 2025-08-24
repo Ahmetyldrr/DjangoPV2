@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Destek Talebi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .urgent {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .user-info {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .message-box {
+            background-color: #f0f8ff;
+            border-left: 4px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🆘 Yeni Destek Talebi</h1>
+            <p style="margin: 5px 0 0 0;">Apphane.com.tr</p>
+        </div>
+
+        <div class="urgent">
+            <h3>⚠️ ACİL DESTEK TALEBİ</h3>
+            <p>Bir kullanıcı destek chat'i başlattı ve yardıma ihtiyacı var!</p>
+        </div>
+
+        <div class="user-info">
+            <h3>👤 Talep Eden Kullanıcı</h3>
+            <p><strong>Ad Soyad:</strong> {{ user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            {% if user.user_type %}
+            <p><strong>Kullanıcı Tipi:</strong> {{ user.get_user_type_display }}</p>
+            {% endif %}
+            <p><strong>Üyelik Tarihi:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+            <p><strong>Chat Odası ID:</strong> #{{ chat_room.id }}</p>
+        </div>
+
+        {% if first_message %}
+        <div class="message-box">
+            <h3>💬 İlk Mesaj</h3>
+            <p><strong>{{ first_message.content|truncatewords:30 }}</strong></p>
+            <p><small>📅 {{ first_message.created_at|date:"d/m/Y H:i" }}</small></p>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ chat_url }}" class="btn">💬 Destek Chat'ine Git</a>
+            <a href="https://apphane.com.tr/admin/chat/chatroom/{{ chat_room.id }}/change/" class="btn btn-success">⚙️ Admin Paneli</a>
+        </div>
+
+        <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4>🎯 Öncelikli İşlemler:</h4>
+            <ul>
+                <li>Kullanıcının talebini hızlıca değerlendirin</li>
+                <li>Gerekirse telefon ile iletişime geçin</li>
+                <li>Chat'te profesyonel bir dil kullanın</li>
+                <li>Çözümlenene kadar takip edin</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><strong>Hızlı Erişim:</strong></p>
+            <ul>
+                <li><a href="https://apphane.com.tr/admin/chat/">Tüm Destek Chat'leri</a></li>
+                <li><a href="https://apphane.com.tr/admin/accounts/user/{{ user.id }}/change/">Kullanıcı Profili</a></li>
+                <li><a href="https://apphane.com.tr/admin/">Admin Dashboard</a></li>
+            </ul>
+            
+            <hr style="margin: 20px 0;">
+            <p>Bu otomatik bir bildirimdir. Bu email'e yanıt vermeyin.</p>
+            <p><strong>Apphane Platform</strong> | <a href="https://apphane.com.tr">apphane.com.tr</a></p>
+        </div>
+    </div>
+</body>
+</html>

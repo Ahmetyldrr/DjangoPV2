@@ -289,6 +289,21 @@ else:
 DEFAULT_FROM_EMAIL = 'Apphane Team <apphane.platform@gmail.com>'  # Gmail üzerinden gönderim
 CONTACT_EMAIL = 'apphane.platform@gmail.com'  # İletişim formlarından gelen mesajlar buraya gelecek
 
+# Admin Notification Settings
+ADMINS = [
+    ('Ahmet Admin', 'apphane.platform@gmail.com'),
+    ('Support Team', 'apphane.platform@gmail.com'),
+]
+
+MANAGERS = ADMINS  # Managers da aynı email'leri alsın
+
+# Chat ve Mesaj Bildirimleri
+CHAT_ADMIN_EMAIL_NOTIFICATIONS = True  # Admin'e yeni mesaj bildirimleri gönder
+CHAT_ADMIN_EMAILS = [
+    'apphane.platform@gmail.com',
+    # Buraya ek admin email'leri eklenebilir
+]
+
 
 # Security Settings for Production
 if not DEBUG:

@@ -8,6 +8,7 @@ from django.db.models import Q
 import json
 
 from .models import ChatRoom, Message, ProjectOffer
+from .email_notifications import send_support_chat_notification
 
 User = get_user_model()
 
@@ -220,11 +221,18 @@ def start_support_chat(request):
     room.participants.set([request.user, admin_user])
     
     # Hoş geldin mesajı gönder
-    Message.objects.create(
+    welcome_message = Message.objects.create(
         room=room,
         sender=admin_user,
         content=f"Merhaba {request.user.get_full_name()}! Size nasıl yardımcı olabilirim?",
         message_type='text'
     )
+    
+    # Admin'e destek chat bildirimi gönder
+    try:
+        send_support_chat_notification(room, welcome_message)
+    except Exception as e:
+        # Bildirim gönderemezse log'la ama devam et
+        pass
     
     return redirect('chat:room', room_id=room.id)

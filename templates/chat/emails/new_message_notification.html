@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Mesaj Bildirimi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .message-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .user-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+        }
+        .urgent {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Yeni Mesaj Bildirimi</h1>
+            <p style="margin: 5px 0 0 0;">Apphane.com.tr</p>
+        </div>
+
+        <div class="urgent">
+            <strong>⚡ Acil:</strong> Platformda yeni bir mesaj alındı ve yanıt bekliyor.
+        </div>
+
+        <div class="user-info">
+            <h3>👤 Gönderen Bilgileri</h3>
+            <p><strong>Ad Soyad:</strong> {{ sender.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ sender.email }}</p>
+            {% if sender.user_type %}
+            <p><strong>Kullanıcı Tipi:</strong> {{ sender.get_user_type_display }}</p>
+            {% endif %}
+            <p><strong>Üyelik Tarihi:</strong> {{ sender.date_joined|date:"d/m/Y" }}</p>
+        </div>
+
+        <div class="message-box">
+            <h3>💬 Mesaj İçeriği</h3>
+            <p><strong>{{ message.content|truncatewords:50 }}</strong></p>
+            {% if message.content|length > 200 %}
+            <p><em>Tam mesajı görmek için chat'i açın...</em></p>
+            {% endif %}
+            <p><small>📅 Gönderilme: {{ message.created_at|date:"d/m/Y H:i" }}</small></p>
+        </div>
+
+        {% if other_participant %}
+        <div class="user-info">
+            <h3>👥 Konuşma Partneri</h3>
+            <p><strong>{{ other_participant.get_full_name }}</strong> ({{ other_participant.email }})</p>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ chat_url }}" class="btn">💬 Chat'i Görüntüle</a>
+            <a href="https://apphane.com.tr/admin/chat/message/{{ message.id }}/change/" class="btn" style="background-color: #28a745;">⚙️ Admin Paneli</a>
+        </div>
+
+        <div class="footer">
+            <p><strong>Hızlı İşlemler:</strong></p>
+            <ul>
+                <li><a href="https://apphane.com.tr/admin/chat/">Tüm Chat'leri Görüntüle</a></li>
+                <li><a href="https://apphane.com.tr/admin/accounts/user/{{ sender.id }}/change/">Kullanıcı Detayı</a></li>
+                <li><a href="https://apphane.com.tr/admin/">Admin Dashboard</a></li>
+            </ul>
+            
+            <hr style="margin: 20px 0;">
+            <p>Bu otomatik bir bildirimdir. Bu email'e yanıt vermeyin.</p>
+            <p><strong>Apphane Platform</strong> | <a href="https://apphane.com.tr">apphane.com.tr</a></p>
+        </div>
+    </div>
+</body>
+</html>
