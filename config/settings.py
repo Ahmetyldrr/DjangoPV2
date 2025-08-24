@@ -67,6 +67,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -217,6 +218,17 @@ SOCIALACCOUNT_PROVIDERS = {
 # Channels (WebSocket) Settings
 ASGI_APPLICATION = 'config.asgi.application'
 
+# Cache Configuration with Redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1' if not DEBUG else 'redis://127.0.0.1:9379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
 # Redis için Channels
 if not DEBUG:
     CHANNEL_LAYERS = {
@@ -265,6 +277,15 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    
+    # Content Security Policy
+    CSP_DEFAULT_SRC = "'self'"
+    CSP_SCRIPT_SRC = "'self' 'unsafe-inline' 'unsafe-eval'"
+    CSP_STYLE_SRC = "'self' 'unsafe-inline' fonts.googleapis.com"
+    CSP_FONT_SRC = "'self' fonts.gstatic.com"
+    CSP_IMG_SRC = "'self' data: https:"
+    CSP_CONNECT_SRC = "'self'"
+    CSP_FRAME_ANCESTORS = "'none'"
     
     # CSRF Settings - HTTPS için True
     CSRF_COOKIE_SECURE = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() == 'true'

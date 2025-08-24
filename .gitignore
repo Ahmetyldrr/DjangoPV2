@@ -179,3 +179,11 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Test Suite - Local testing files
+test_suite/
+*.log
+*_test_*.txt
+*_test_*.log
+*_report.txt
+*_report.md
