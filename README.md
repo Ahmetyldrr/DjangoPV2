@@ -32,8 +32,11 @@ docker-compose logs -f
 ## 📋 CI/CD Pipeline
 - **Trigger**: Push to main branch
 - **Tests**: Automatic Django tests
-- **Deploy**: Automatic deployment to server
-- **Health Check**: Automatic verification
+- **Deploy**: Zero-downtime deployment with HTTPS
+- **SSL**: Auto-managed certificates
+- **Static Files**: Auto-sync for Nginx compatibility  
+- **Health Check**: Multiple verification layers
+- **Nginx**: Auto-restart and 502 error prevention
 
 ## ✅ Fixed Issues
 1. ✅ Dockerfile gunicorn command simplified

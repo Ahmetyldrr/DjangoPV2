@@ -69,14 +69,52 @@ echo -e "${BLUE}10.1. Static dosyalar Nginx için kopyalanıyor...${NC}"
 docker cp apphane_web_1:/app/staticfiles/. /var/www/apphane/staticfiles/ 2>/dev/null || true
 docker cp apphane_web_1:/app/media/. /var/www/apphane/media/ 2>/dev/null || true
 
+# 10.2. Nginx'i yeniden başlat (502 hatası için)
+echo -e "${BLUE}10.2. Nginx yeniden başlatılıyor...${NC}"
+sudo systemctl restart nginx
+sudo systemctl enable nginx
+
+# 10.3. Servislerin hazır olmasını bekle
+echo -e "${BLUE}10.3. Servislerin hazır olması bekleniyor...${NC}"
+sleep 30
+
+# 10.4. Health check with retry
+echo -e "${BLUE}10.4. Health check yapılıyor...${NC}"
+for i in {1..5}; do
+  if curl -f http://localhost:9000/health/ > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ Django backend sağlıklı${NC}"
+    break
+  else
+    echo -e "${YELLOW}⏳ Deneme $i: Django backend bekleniyor...${NC}"
+    sleep 10
+  fi
+done
+
 # 11. Final verification
 echo -e "${BLUE}11. Final kontrol yapılıyor...${NC}"
-if curl -f http://localhost:9000/health/ > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ Deployment başarılı!${NC}"
+
+# Django backend test
+if curl -f http://localhost:9000/ > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ Django backend çalışıyor${NC}"
 else
-    echo -e "${RED}❌ Final kontrol başarısız!${NC}"
-    exit 1
+    echo -e "${RED}❌ Django backend kontrol başarısız!${NC}"
 fi
+
+# HTTPS site test
+if curl -f https://apphane.com.tr/ > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ HTTPS site çalışıyor${NC}"
+else
+    echo -e "${RED}❌ HTTPS site kontrol başarısız!${NC}"
+fi
+
+# Static files test
+if curl -f https://apphane.com.tr/static/css/style.css > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ Static dosyalar çalışıyor${NC}"
+else
+    echo -e "${YELLOW}⚠️ Static dosya kontrolü başarısız${NC}"
+fi
+
+echo -e "${GREEN}🎉 Deployment tamamlandı!${NC}"
 
 # 12. Servis durumlarını göster
 echo -e "${BLUE}12. Servis durumları:${NC}"

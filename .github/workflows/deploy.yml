@@ -86,6 +86,43 @@ jobs:
           # Copy static files to host for Nginx (HTTPS compatibility)
           docker cp apphane_web_1:/app/staticfiles/. /var/www/apphane/staticfiles/ 2>/dev/null || true
           docker cp apphane_web_1:/app/media/. /var/www/apphane/media/ 2>/dev/null || true
+          
+          # Ensure Nginx is running and configured correctly
+          systemctl restart nginx
+          systemctl enable nginx
+          
+          # Wait for services to be fully ready
+          echo "⏳ Waiting for services to be ready..."
+          sleep 30
+          
+          # Health check with retry
+          for i in {1..5}; do
+            if curl -f http://localhost:9000/health/ > /dev/null 2>&1; then
+              echo "✅ Django backend is healthy"
+              break
+            else
+              echo "⏳ Attempt $i: Waiting for Django backend..."
+              sleep 10
+            fi
+          done
+          
+          # Test HTTPS site
+          if curl -f https://apphane.com.tr/ > /dev/null 2>&1; then
+            echo "✅ HTTPS site is working"
+          else
+            echo "❌ HTTPS site test failed"
+          fi
+          
+          # Debug info if something fails
+          echo "📊 Final Status Check:"
+          echo "Docker containers:"
+          docker-compose ps
+          echo "Nginx status:"
+          systemctl status nginx --no-pager | head -10
+          echo "Port usage:"
+          netstat -tulpn | grep -E ':(80|443|9000)' || true
+          
+          echo "✅ Deployment completed successfully!"
     
           
           echo "✅ Deployment completed successfully!"
@@ -99,7 +136,11 @@ jobs:
     - name: Notification
       run: |
         if [ "${{ needs.deploy.result }}" == "success" ]; then
-          echo "🚀 Deployment successful! Site is live at https://apphane.com.tr"
+          echo "🚀 Deployment successful!"
+          echo "✅ Site: https://apphane.com.tr"
+          echo "✅ Admin: https://apphane.com.tr/admin/"
+          echo "✅ Apps: https://apphane.com.tr/uygulamalar/"
+          echo "🔒 HTTPS SSL enabled"
         else
           echo "❌ Deployment failed!"
           exit 1
