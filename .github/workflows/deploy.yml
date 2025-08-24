@@ -43,7 +43,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install Django psycopg2-binary requests django-allauth PyJWT cryptography oauthlib requests-oauthlib python3-openid
-        pip install django-csp django-redis channels channels-redis redis celery whitenoise markdown Pillow gunicorn
+        pip install django-csp channels channels-redis redis celery whitenoise markdown Pillow gunicorn
         pip install -r requirements.txt || true
     
     - name: Run tests

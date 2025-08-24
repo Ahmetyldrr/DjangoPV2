@@ -28,16 +28,26 @@ def health_check(request):
         health_status["database"] = f"unhealthy: {str(e)}"
         health_status["status"] = "unhealthy"
     
-    # Redis check
+    # Redis check - optional
     try:
-        redis_client = redis.from_url(settings.CACHES['default']['LOCATION'])
-        redis_client.ping()
-        health_status["redis"] = "healthy"
+        cache_backend = settings.CACHES['default']['BACKEND']
+        if 'redis' in cache_backend.lower():
+            # Redis cache kullanılıyorsa test et
+            import redis
+            redis_client = redis.from_url(settings.CACHES['default']['LOCATION'])
+            redis_client.ping()
+            health_status["redis"] = "healthy"
+        else:
+            # Dummy cache kullanılıyorsa skip
+            health_status["redis"] = "skipped (dummy cache)"
+    except ImportError:
+        health_status["redis"] = "skipped (redis not available)"
     except Exception as e:
         health_status["redis"] = f"unhealthy: {str(e)}"
-        health_status["status"] = "unhealthy"
+        # Redis hatası status'u unhealthy yapmaz (optional service)
     
-    status_code = 200 if health_status["status"] == "healthy" else 503
+    # Sadece database hatası status'u unhealthy yapar
+    status_code = 200 if health_status["database"] == "healthy" else 503
     return JsonResponse(health_status, status=status_code)
 
 

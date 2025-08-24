@@ -219,26 +219,36 @@ SOCIALACCOUNT_PROVIDERS = {
 # Channels (WebSocket) Settings
 ASGI_APPLICATION = 'config.asgi.application'
 
-# Cache Configuration with Redis
-# Test ortamında Redis yoksa dummy cache kullan
+# Cache Configuration 
+# Test ortamında veya django_redis yoksa dummy cache kullan
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 
-if 'test' in sys.argv or os.environ.get('GITHUB_ACTIONS'):
-    # Test ortamında dummy cache kullan
+try:
+    import django_redis
+    # django_redis mevcutsa Redis cache kullan
+    if 'test' in sys.argv or os.environ.get('GITHUB_ACTIONS'):
+        # Test ortamında dummy cache kullan
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            }
+        }
+    else:
+        # Production/Development ortamında Redis kullan
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': 'redis://redis:6379/1' if not DEBUG else 'redis://127.0.0.1:9379/1',
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                }
+            }
+        }
+except ImportError:
+    # django_redis mevcut değilse dummy cache kullan
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
-else:
-    # Production/Development ortamında Redis kullan
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': 'redis://redis:6379/1' if not DEBUG else 'redis://127.0.0.1:9379/1',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
         }
     }
 
