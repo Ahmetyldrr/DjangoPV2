@@ -101,7 +101,7 @@ if not DEBUG:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'fxdb',
             'USER': 'ahmet21',
-            'PASSWORD': 'diclem2121',
+            'PASSWORD': 'dicle2121',
             'HOST': '165.227.130.23',
             'PORT': '5432',
             'OPTIONS': {
