@@ -30,7 +30,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 # 5. IP tabanlı nginx konfigürasyonu
 echo "5. Nginx konfigürasyonu oluşturuluyor..."
-cat > nginx.conf << 'EOF'
+cat > nginx-temp.conf << 'EOF'
 events {
     worker_connections 1024;
 }
@@ -203,7 +203,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-temp.conf:/etc/nginx/nginx.conf
       - static_volume:/var/www/static
       - media_volume:/var/www/media
       - /etc/ssl/certs:/etc/ssl/certs:ro

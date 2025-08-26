@@ -148,7 +148,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-temp.conf:/etc/nginx/nginx.conf
       - static_volume:/var/www/static
       - media_volume:/var/www/media
       - /etc/ssl/certs:/etc/ssl/certs
@@ -162,7 +162,7 @@ volumes:
 
 ## 🌐 Nginx Konfigürasyonu
 
-### nginx.conf
+### nginx-temp.conf
 ```nginx
 events {
     worker_connections 1024;
