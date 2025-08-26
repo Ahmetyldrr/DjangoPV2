@@ -59,7 +59,7 @@ sudo -u postgres psql
 ```
 
 ```sql
-CREATE USER ahmet21 WITH PASSWORD 'diclem2121.';
+CREATE USER ahmet21 WITH PASSWORD 'diclem2121';
 CREATE DATABASE fxdb OWNER ahmet21;
 GRANT ALL PRIVILEGES ON DATABASE fxdb TO ahmet21;
 ALTER USER ahmet21 CREATEDB;
@@ -129,7 +129,7 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=False
-      - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
+      - DATABASE_URL=postgresql://ahmet21:diclem2121@165.227.130.23:5432/fxdb
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
@@ -246,7 +246,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'fxdb',
         'USER': 'ahmet21',
-        'PASSWORD': 'diclem2121.',
+        'PASSWORD': 'diclem2121',
         'HOST': '165.227.130.23',
         'PORT': '5432',
         'OPTIONS': {
@@ -471,7 +471,7 @@ docker-compose exec -T postgres psql -U ahmet21 fxdb < backup_file.sql
 ```env
 SECRET_KEY=your-secret-key-here
 DEBUG=False
-DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
+DATABASE_URL=postgresql://ahmet21:diclem2121@165.227.130.23:5432/fxdb
 REDIS_URL=redis://redis:6379/0
 EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password

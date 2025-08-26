@@ -125,7 +125,7 @@ services:
       - "9000:9000"
     environment:
       - DEBUG=False
-      - DATABASE_URL=postgresql://ahmet21:diclem2121.@165.227.130.23:5432/fxdb
+      - DATABASE_URL=postgresql://ahmet21:diclem2121@165.227.130.23:5432/fxdb
       - REDIS_URL=redis://redis:9379/0
       - SECURE_SSL_REDIRECT=False
     depends_on:

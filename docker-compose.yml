@@ -44,7 +44,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx-ssl.conf:/etc/nginx/nginx.conf
+      - ./nginx-ssl.conf:/etc/nginx/nginx-temp.conf
       - static_volume:/var/www/static
       - media_volume:/var/www/media
       - /etc/letsencrypt:/etc/letsencrypt:ro
